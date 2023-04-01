@@ -73,6 +73,7 @@ PODS:
   - LoggerAPI (1.9.200):
     - Logging (~> 1.1)
   - Logging (1.4.0)
+  - MTBBarcodeScanner (5.0.11)
   - nanopb (2.30908.0):
     - nanopb/decode (= 2.30908.0)
     - nanopb/encode (= 2.30908.0)
@@ -84,6 +85,9 @@ PODS:
   - "permission_handler (5.1.0+2)":
     - Flutter
   - PromisesObjC (2.2.0)
+  - qr_code_scanner (0.2.0):
+    - Flutter
+    - MTBBarcodeScanner
   - SwiftJWT (3.6.200):
     - BlueCryptor (~> 1.0)
     - BlueECC (~> 1.1)
@@ -97,6 +101,7 @@ DEPENDENCIES:
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
+  - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
 
 SPEC REPOS:
   trunk:
@@ -118,6 +123,7 @@ SPEC REPOS:
     - KituraContracts
     - LoggerAPI
     - Logging
+    - MTBBarcodeScanner
     - nanopb
     - PromisesObjC
     - SwiftJWT
@@ -133,6 +139,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/ios"
   permission_handler:
     :path: ".symlinks/plugins/permission_handler/ios"
+  qr_code_scanner:
+    :path: ".symlinks/plugins/qr_code_scanner/ios"
 
 SPEC CHECKSUMS:
   ar_flutter_plugin: 5ee5bcce3fe8fc5623dea124f4124e4fe619be9a
@@ -156,10 +164,12 @@ SPEC CHECKSUMS:
   KituraContracts: e845e60dc8627ad0a76fa55ef20a45451d8f830b
   LoggerAPI: ad9c4a6f1e32f518fdb43a1347ac14d765ab5e3d
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
+  MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
+  qr_code_scanner: bb67d64904c3b9658ada8c402e8b4d406d5d796e
   SwiftJWT: 88c412708f58c169d431d344c87bc79a87c830ae
 
 PODFILE CHECKSUM: d34f5a26d87615ebef274b2dfa63405fb9458751
