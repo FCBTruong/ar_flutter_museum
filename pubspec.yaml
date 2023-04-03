@@ -15,6 +15,7 @@ dependencies:
   google_fonts:
   ar_flutter_plugin: ^0.6.2
   qr_code_scanner: ^1.0.1
+  convex_bottom_bar: ^3.2.0
 
 dev_dependencies:
   flutter_test:

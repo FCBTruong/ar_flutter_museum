@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
 import 'package:ar_flutter_plugin/managers/ar_session_manager.dart';
@@ -24,7 +26,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   ARNode? localObjectNode;
 
 //String webObjectReference;
-  ARNode? webObjectNode;
+  List<ARNode?> webObjectNodeList = [];
 
   void onARViewCreated(
       ARSessionManager arSessionManager,
@@ -57,7 +59,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
           type: NodeType.localGLTF2,
           uri: "assets/Chicken_01/Chicken_01.gltf",
           scale: Vector3(0.2, 0.2, 0.2),
-          position: Vector3(0.0, 0.0, 0.0),
+          position: Vector3(1.0 * (Random().nextInt(10)), 1.0 * (Random().nextInt(10)), 10),
           rotation: Vector4(1.0, 0.0, 0.0, 0.0));
       // 3
       bool? didAddLocalNode = await arObjectManager.addNode(newNode);
@@ -66,18 +68,15 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   }
 
   Future<void> onWebObjectAtButtonPressed() async {
-    if (webObjectNode != null) {
-      arObjectManager.removeNode(webObjectNode!);
-      webObjectNode = null;
-    } else {
-      var newNode = ARNode(
-          type: NodeType.webGLB,
-          uri:
-              "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-          scale: Vector3(0.2, 0.2, 0.2));
-      bool? didAddWebNode = await arObjectManager.addNode(newNode);
-      webObjectNode = (didAddWebNode!) ? newNode : null;
-    }
+    var newNode = ARNode(
+        type: NodeType.webGLB,
+        uri:
+            "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
+        scale: Vector3(0.2, 0.2, 0.2),
+        position: Vector3(1.0 * (Random().nextInt(10)), 1.0 * (Random().nextInt(10)), 0)
+        );
+    await arObjectManager.addNode(newNode);
+    webObjectNodeList.add(newNode);
   }
 
   @override

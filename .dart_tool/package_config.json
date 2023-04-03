@@ -38,6 +38,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "convex_bottom_bar",
+      "rootUri": "file:///Users/lap60576-local/.pub-cache/hosted/pub.dev/convex_bottom_bar-3.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "crypto",
       "rootUri": "file:///Users/lap60576-local/.pub-cache/hosted/pub.dev/crypto-3.0.2",
       "packageUri": "lib/",
@@ -320,7 +326,7 @@
       "languageVersion": "2.16"
     }
   ],
-  "generated": "2023-04-01T14:45:38.652359Z",
+  "generated": "2023-04-02T13:57:50.654305Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }
