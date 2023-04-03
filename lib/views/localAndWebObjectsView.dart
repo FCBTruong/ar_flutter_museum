@@ -21,6 +21,7 @@ class LocalAndWebObjectsView extends StatefulWidget {
 class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   late ARSessionManager arSessionManager;
   late ARObjectManager arObjectManager;
+  late ARLocationManager arLocationManager;
 
 //String localObjectReference;
   ARNode? localObjectNode;
@@ -36,6 +37,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     // 1
     this.arSessionManager = arSessionManager;
     this.arObjectManager = arObjectManager;
+    this.arLocationManager = arLocationManager;
     // 2
     this.arSessionManager.onInitialize(
           showFeaturePoints: false,
@@ -57,9 +59,12 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       // 2
       var newNode = ARNode(
           type: NodeType.localGLTF2,
-          uri: "assets/Chicken_01/Chicken_01.gltf",
-          scale: Vector3(0.2, 0.2, 0.2),
-          position: Vector3(1.0 * (Random().nextInt(10)), 1.0 * (Random().nextInt(10)), 10),
+          uri: "assets/Chicken_01/Velociraptor.glb",
+          scale: Vector3(1, 1, 1),
+          position: Vector3(
+              arLocationManager.currentLocation.latitude,
+              arLocationManager.currentLocation.longitude,
+              arLocationManager.currentLocation.altitude),
           rotation: Vector4(1.0, 0.0, 0.0, 0.0));
       // 3
       bool? didAddLocalNode = await arObjectManager.addNode(newNode);
@@ -73,8 +78,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         uri:
             "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
         scale: Vector3(0.2, 0.2, 0.2),
-        position: Vector3(1.0 * (Random().nextInt(10)), 1.0 * (Random().nextInt(10)), 0)
-        );
+        position: Vector3(0, 0, 0));
     await arObjectManager.addNode(newNode);
     webObjectNodeList.add(newNode);
   }
@@ -91,7 +95,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height * .8,
+              height: MediaQuery.of(context).size.height * .7,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(22),
                 child: Container(

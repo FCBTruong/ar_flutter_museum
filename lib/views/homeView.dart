@@ -42,6 +42,14 @@ class _MyHomePage extends State<MyHomePage> {
           _currentScreen = const QRScanScene();
         });
         break;
+
+      case 3:
+        setState(() {
+          {
+            _currentScreen = const LocalAndWebObjectsView();
+          }
+        });
+        break;
     }
   }
 
