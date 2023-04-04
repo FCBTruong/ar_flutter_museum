@@ -151,6 +151,7 @@ class _QRScanSceneState extends State<QRScanScene> {
         result = scanData;
 
         // TODO
+        controller.dispose();
         Navigator.push(
             context,
             MaterialPageRoute(

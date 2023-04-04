@@ -1,4 +1,4 @@
-import 'dart:math';
+
 
 import 'package:flutter/material.dart';
 import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
@@ -10,6 +10,7 @@ import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'package:ar_flutter_plugin/datatypes/node_types.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
+import 'dart:developer';
 
 class LocalAndWebObjectsView extends StatefulWidget {
   const LocalAndWebObjectsView({Key? key}) : super(key: key);
@@ -27,7 +28,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   ARNode? localObjectNode;
 
 //String webObjectReference;
-  List<ARNode?> webObjectNodeList = [];
+  ARNode? webObjectNode;
 
   void onARViewCreated(
       ARSessionManager arSessionManager,
@@ -48,6 +49,8 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         );
     // 3
     this.arObjectManager.onInitialize();
+
+    onLocalObjectButtonPressed();
   }
 
   Future<void> onLocalObjectButtonPressed() async {
@@ -57,14 +60,15 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       localObjectNode = null;
     } else {
       // 2
+    //  log(' ${arLocationManager.currentLocation.latitude.toString()}');
       var newNode = ARNode(
           type: NodeType.localGLTF2,
           uri: "assets/Chicken_01/Velociraptor.glb",
-          scale: Vector3(1, 1, 1),
+          scale: Vector3(2, 2, 2),
           position: Vector3(
-              arLocationManager.currentLocation.latitude,
-              arLocationManager.currentLocation.longitude,
-              arLocationManager.currentLocation.altitude),
+              0,
+              -2.3,
+              -2.3),
           rotation: Vector4(1.0, 0.0, 0.0, 0.0));
       // 3
       bool? didAddLocalNode = await arObjectManager.addNode(newNode);
@@ -73,31 +77,39 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   }
 
   Future<void> onWebObjectAtButtonPressed() async {
-    var newNode = ARNode(
-        type: NodeType.webGLB,
-        uri:
-            "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-        scale: Vector3(0.2, 0.2, 0.2),
-        position: Vector3(0, 0, 0));
-    await arObjectManager.addNode(newNode);
-    webObjectNodeList.add(newNode);
+    if (webObjectNode != null) {
+      arObjectManager.removeNode(webObjectNode!);
+      webObjectNode = null;
+    } else {
+      var newNode = ARNode(
+          type: NodeType.webGLB,
+          uri:
+              "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
+          scale: Vector3(0.2, 0.2, 0.2));
+      bool? didAddWebNode = await arObjectManager.addNode(newNode);
+      webObjectNode = (didAddWebNode!) ? newNode : null;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Local / Web Objects"),
+        title: const Text("Brachiosaurus"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height * .7,
+              height: MediaQuery.of(context).size.height,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(0),
                 child: Container(
                     color: Colors.black,
                     child: ARView(
@@ -105,30 +117,10 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                     )),
               ),
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                      onPressed: () {
-                        onLocalObjectButtonPressed();
-                      },
-                      child: const Text("Add / Remove Local Object")),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: ElevatedButton(
-                      onPressed: () {
-                        onWebObjectAtButtonPressed();
-                      },
-                      child: const Text("Add / Remove Web Object")),
-                )
-              ],
-            ),
           ],
         ),
       ),
+      
     );
   }
 }

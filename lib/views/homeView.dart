@@ -31,23 +31,14 @@ class _MyHomePage extends State<MyHomePage> {
 
     switch (currentTab) {
       case 0:
-        setState(() {
-          _currentScreen = const DiscoveryScreen();
-        });
+         Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const LocalAndWebObjectsView()));
         break;
       case 1:
-        break;
-      case 2:
         setState(() {
           _currentScreen = const QRScanScene();
-        });
-        break;
-
-      case 3:
-        setState(() {
-          {
-            _currentScreen = const LocalAndWebObjectsView();
-          }
         });
         break;
     }
@@ -73,13 +64,10 @@ class _MyHomePage extends State<MyHomePage> {
   BottomAppBar createBottomAppBar(BuildContext context) {
     return BottomAppBar(
         child: ConvexAppBar(
-      initialActiveIndex: 2,
+      initialActiveIndex: 1,
       items: const [
         TabItem(icon: Icons.home, title: 'Home'),
-        TabItem(icon: Icons.map, title: 'Discovery'),
         TabItem(icon: Icons.qr_code_scanner_rounded, title: 'Scan'),
-        TabItem(icon: Icons.message, title: 'Message'),
-        TabItem(icon: Icons.people, title: 'Profile'),
       ],
       onTap: (int i) => {onChangeTab(i, context)},
     ));
