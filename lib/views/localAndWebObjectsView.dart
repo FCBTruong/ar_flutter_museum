@@ -1,5 +1,4 @@
-
-
+import 'package:arcore_example/views/artifact_detail_scene.dart';
 import 'package:flutter/material.dart';
 import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
 import 'package:ar_flutter_plugin/managers/ar_session_manager.dart';
@@ -29,6 +28,8 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
 
 //String webObjectReference;
   ARNode? webObjectNode;
+  bool isTest = false;
+  bool isViewingDetail = false;
 
   void onARViewCreated(
       ARSessionManager arSessionManager,
@@ -60,15 +61,12 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       localObjectNode = null;
     } else {
       // 2
-    //  log(' ${arLocationManager.currentLocation.latitude.toString()}');
+      //  log(' ${arLocationManager.currentLocation.latitude.toString()}');
       var newNode = ARNode(
           type: NodeType.localGLTF2,
           uri: "assets/Chicken_01/Velociraptor.glb",
           scale: Vector3(2, 2, 2),
-          position: Vector3(
-              0,
-              -2.3,
-              -2.3),
+          position: Vector3(0, -0.5, -0.5),
           rotation: Vector4(1.0, 0.0, 0.0, 0.0));
       // 3
       bool? didAddLocalNode = await arObjectManager.addNode(newNode);
@@ -106,21 +104,38 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(0),
-                child: Container(
-                    color: Colors.black,
-                    child: ARView(
-                      onARViewCreated: onARViewCreated,
-                    )),
-              ),
-            ),
+            Expanded(
+                child: SizedBox(
+              child: isViewingDetail
+                  ? Container(
+                      padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
+                      color: Colors.white12,
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(0),
+                      child: Container(
+                          color: Colors.black,
+                          child: isTest
+                              ? Container()
+                              : ARView(
+                                  onARViewCreated: onARViewCreated,
+                                )),
+                    ),
+            )),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ArtifactDetailScene()));
+                });
+              },
+              child: const Text('read more', style: TextStyle(fontSize: 20)),
+            )
           ],
         ),
       ),
-      
     );
   }
 }

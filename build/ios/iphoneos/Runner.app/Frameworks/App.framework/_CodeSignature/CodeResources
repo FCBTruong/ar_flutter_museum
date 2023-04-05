@@ -10,7 +10,7 @@
 		</data>
 		<key>flutter_assets/AssetManifest.json</key>
 		<data>
-		r6a9gxwXXxO7Zd9BNVzAOQyyHHs=
+		DhZSxlJjhVJvTuLlQ8BtxfibYyY=
 		</data>
 		<key>flutter_assets/FontManifest.json</key>
 		<data>
@@ -40,6 +40,10 @@
 		<data>
 		hgmB4lJ+Waek1F88cyJbOaLZzmY=
 		</data>
+		<key>flutter_assets/assets/images/tyranosaurus.jpeg</key>
+		<data>
+		xLc0JS3yK/seYGoyJmdfcwvMiew=
+		</data>
 		<key>flutter_assets/assets/triangle.png</key>
 		<data>
 		+JEfD0RdvidqPyUsa0BlcvZg57o=
@@ -59,7 +63,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			c5uaXcii9iyhxspi12xN6vPsEajH8jCpfM/lphee0os=
+			7lee49vbEQOqfxxW00UoCxwkUtzaulQM3JcnGvaINi0=
 			</data>
 		</dict>
 		<key>flutter_assets/FontManifest.json</key>
@@ -109,6 +113,13 @@
 			<key>hash2</key>
 			<data>
 			fUMhy1/RwLiVrhfJCvolOBHZy/EJpkPpcbuLFc5hZlY=
+			</data>
+		</dict>
+		<key>flutter_assets/assets/images/tyranosaurus.jpeg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			GQ36bqS9JY3br75f/mk2f7W3uPJoYvNPPG4+c9jZYJw=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/triangle.png</key>
