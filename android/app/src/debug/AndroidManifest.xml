@@ -4,6 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
       <uses-permission android:name="android.permission.CAMERA" />
+      <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- Indicates that app requires ARCore ("AR Required"). Ensures app is only
          visible in the Google Play Store on devices that support ARCore.

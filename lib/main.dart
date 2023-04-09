@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
               iconTheme: const IconThemeData(color: Colors.black),
               titleTextStyle:
                   GoogleFonts.nunito(color: Colors.black, fontSize: 20))),
-      home: const MyHomePage(title: 'Museum AR'),
+      home: const MyHomePage(),
     );
   }
 }

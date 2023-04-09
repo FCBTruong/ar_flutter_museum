@@ -2,21 +2,23 @@ import 'dart:ffi';
 
 import 'package:arcore_example/views/DiscoveryScreen.dart';
 import 'package:arcore_example/views/localAndWebObjectsView.dart';
+import 'package:arcore_example/views/museum_scene.dart';
 import 'package:flutter/material.dart';
 import 'package:arcore_example/qr_code.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'favorite_scene.dart';
 
 class MyHomePage extends StatefulWidget {
-  final String title;
-  const MyHomePage({required this.title, Key? key}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MyHomePage();
 }
 
 class _MyHomePage extends State<MyHomePage> {
+  String title = "AR";
   int currentTab = 2;
-  Widget _currentScreen = QRScanScene();
+  Widget _currentScreen = const QRScanScene();
   final PageStorageBucket _bucket = PageStorageBucket();
 
   @override
@@ -31,14 +33,21 @@ class _MyHomePage extends State<MyHomePage> {
 
     switch (currentTab) {
       case 0:
-         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const LocalAndWebObjectsView()));
+        setState(() {
+          _currentScreen = const MuseumScene();
+          title = "Bảo tàng";
+        });
         break;
       case 1:
         setState(() {
           _currentScreen = const QRScanScene();
+          title = "Quét mã";
+        });
+        break;
+      case 2:
+        setState(() {
+          _currentScreen = const FavoriteScene();
+          title = "Yêu thích";
         });
         break;
     }
@@ -49,7 +58,7 @@ class _MyHomePage extends State<MyHomePage> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.title}',
+            title,
           ),
         ),
         body: Container(
@@ -66,8 +75,9 @@ class _MyHomePage extends State<MyHomePage> {
         child: ConvexAppBar(
       initialActiveIndex: 1,
       items: const [
-        TabItem(icon: Icons.home, title: 'Home'),
+        TabItem(icon: Icons.museum, title: 'Museum'),
         TabItem(icon: Icons.qr_code_scanner_rounded, title: 'Scan'),
+        TabItem(icon: Icons.favorite, title: 'Favorite'),
       ],
       onTap: (int i) => {onChangeTab(i, context)},
     ));

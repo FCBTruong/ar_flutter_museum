@@ -13,9 +13,10 @@ dependencies:
   flutter:
     sdk: flutter
   google_fonts:
-  ar_flutter_plugin: ^0.6.2
+  ar_flutter_plugin: ^0.7.3
   qr_code_scanner: ^1.0.1
   convex_bottom_bar: ^3.2.0
+  flutter_html: ^2.0.0
 
 dev_dependencies:
   flutter_test:
