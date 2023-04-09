@@ -28,7 +28,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
 
 //String webObjectReference;
   ARNode? webObjectNode;
-  bool isTest = false;
+  bool isTest = true;
   bool isViewingDetail = false;
 
   void onARViewCreated(
