@@ -30,6 +30,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   Widget createWidgetByBlock(Map<String, dynamic> block) {
     Widget wg = Container();
     Map<String, dynamic> blData = block['data'];
+    log('create widget by block');
 
     switch (block['type']) {
       case 'header':

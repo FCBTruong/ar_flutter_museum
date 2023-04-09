@@ -28,7 +28,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
 
 //String webObjectReference;
   ARNode? webObjectNode;
-  bool isTest = true;
+  bool isTest = false;
   bool isViewingDetail = false;
 
   void onARViewCreated(
@@ -64,7 +64,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       //  log(' ${arLocationManager.currentLocation.latitude.toString()}');
       var newNode = ARNode(
           type: NodeType.localGLTF2,
-          uri: "assets/Chicken_01/Velociraptor.glb",
+          uri: "assets/Chicken_01/phoenix_bird.glb",
           scale: Vector3(2, 2, 2),
           position: Vector3(0, -0.5, -0.5),
           rotation: Vector4(1.0, 0.0, 0.0, 0.0));
@@ -122,17 +122,6 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                                 )),
                     ),
             )),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ArtifactDetailScene()));
-                });
-              },
-              child: const Text('read more', style: TextStyle(fontSize: 20)),
-            )
           ],
         ),
       ),

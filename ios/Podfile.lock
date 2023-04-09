@@ -1,22 +1,27 @@
 PODS:
   - ar_flutter_plugin (0.6.2):
-    - ARCore/CloudAnchors (~> 1.26.0)
+    - ARCore/CloudAnchors (~> 1.32.0)
     - Flutter
     - GLTFSceneKit
     - SwiftJWT
-  - ARCore/Base (1.26.0):
+  - ARCore/Base (1.32.0):
     - GoogleDataTransport (~> 9.0)
     - GoogleToolboxForMac/Logger (~> 2.1)
     - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
-    - GTMSessionFetcher/Core (~> 1.2)
-    - nanopb (~> 2.30908.0)
-  - ARCore/CloudAnchors (1.26.0):
-    - ARCore/Base (~> 1.26)
-    - Firebase/RemoteConfig (~> 8.0)
+    - nanopb (< 2.30910.0, >= 2.30908.0)
+  - ARCore/CloudAnchors (1.32.0):
+    - ARCore/GARSession (~> 1.32)
     - GoogleToolboxForMac/Logger (~> 2.1)
     - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
     - GTMSessionFetcher/Core (~> 1.2)
-    - nanopb (~> 2.30908.0)
+    - nanopb (< 2.30910.0, >= 2.30908.0)
+  - ARCore/GARSession (1.32.0):
+    - ARCore/Base (~> 1.32)
+    - Firebase/RemoteConfig (< 10.0, >= 8.0)
+    - GoogleDataTransport (~> 9.0)
+    - GoogleToolboxForMac/Logger (~> 2.1)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
+    - nanopb (< 2.30910.0, >= 2.30908.0)
   - BlueCryptor (1.0.32)
   - BlueECC (1.2.5)
   - BlueRSA (1.0.200)
@@ -82,7 +87,7 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - "permission_handler (5.1.0+2)":
+  - permission_handler_apple (9.0.4):
     - Flutter
   - PromisesObjC (2.2.0)
   - qr_code_scanner (0.2.0):
@@ -94,14 +99,23 @@ PODS:
     - BlueRSA (~> 1.0)
     - KituraContracts (~> 1.2)
     - LoggerAPI (~> 1.7)
+  - video_player_avfoundation (0.0.1):
+    - Flutter
+  - wakelock (0.0.1):
+    - Flutter
+  - webview_flutter_wkwebview (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - ar_flutter_plugin (from `.symlinks/plugins/ar_flutter_plugin/ios`)
   - Flutter (from `Flutter`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
-  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
+  - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/ios`)
+  - wakelock (from `.symlinks/plugins/wakelock/ios`)
+  - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
 SPEC REPOS:
   trunk:
@@ -137,14 +151,20 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/geolocator_apple/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/ios"
-  permission_handler:
-    :path: ".symlinks/plugins/permission_handler/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   qr_code_scanner:
     :path: ".symlinks/plugins/qr_code_scanner/ios"
+  video_player_avfoundation:
+    :path: ".symlinks/plugins/video_player_avfoundation/ios"
+  wakelock:
+    :path: ".symlinks/plugins/wakelock/ios"
+  webview_flutter_wkwebview:
+    :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
-  ar_flutter_plugin: 5ee5bcce3fe8fc5623dea124f4124e4fe619be9a
-  ARCore: 5c18b8b1ae71b5dfb9883ecdd642d3ad1e8cee1a
+  ar_flutter_plugin: 8e0c6026776a842d3deea2cf8da5d2a4ed8b2376
+  ARCore: 3124ed997ad2554a24d5fdbeb40f76265dea8d69
   BlueCryptor: b0aee3d9b8f367b49b30de11cda90e1735571c24
   BlueECC: 0d18e93347d3ec6d41416de21c1ffa4d4cd3c2cc
   BlueRSA: dfeef51db96bcc4edec654956c1581adbda4e6a3
@@ -155,7 +175,7 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 40bd9054049b2eae9a2c38ef1c3dd213df3605cd
   FirebaseRemoteConfig: 2d6e2cfdb49af79535c8af8a80a4a5009038ec2b
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  geolocator_apple: b741765c55dc21950e3e106e8b3584e55cf81ce5
+  geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
   GLTFSceneKit: d1b437c514ba2aed5555afb0fddd64e030612d57
   GoogleDataTransport: ea169759df570f4e37bdee1623ec32a7e64e67c4
   GoogleToolboxForMac: 8bef7c7c5cf7291c687cf5354f39f9db6399ad34
@@ -167,10 +187,13 @@ SPEC CHECKSUMS:
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
-  permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
+  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
   qr_code_scanner: bb67d64904c3b9658ada8c402e8b4d406d5d796e
   SwiftJWT: 88c412708f58c169d431d344c87bc79a87c830ae
+  video_player_avfoundation: 81e49bb3d9fb63dccf9fa0f6d877dc3ddbeac126
+  wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
+  webview_flutter_wkwebview: b7e70ef1ddded7e69c796c7390ee74180182971f
 
 PODFILE CHECKSUM: d34f5a26d87615ebef274b2dfa63405fb9458751
 
