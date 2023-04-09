@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:arcore_example/logic/text_handler.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class ArtifactDetailScene extends StatefulWidget {
   const ArtifactDetailScene({Key? key}) : super(key: key);
@@ -25,9 +27,6 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
 
     switch (block['type']) {
       case 'header':
-      int level = blData['level'];
-      
-   
         wg = Text(
           blData['text'],
           textAlign: TextAlign.center,
@@ -40,13 +39,8 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
         break;
       case 'paragraph':
         {
-          wg = Text(
-            blData['text'],
-            textAlign: TextAlign.justify,
-            style: const TextStyle(
-              color: Colors.black,
-            ),
-          );
+          wg =  Html(data: blData['text']);
+      
           break;
         }
       case 'image':
