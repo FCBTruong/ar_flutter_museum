@@ -70,6 +70,8 @@ class _QRScanSceneState extends State<QRScanScene> {
       setState(() {
         result = scanData;
 
+        var url = ""; // tod later
+       
         // TODO
         controller.dispose();
         Navigator.push(

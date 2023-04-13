@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:arcore_example/logic/text_handler.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:http/http.dart' as http;
 
 class ArtifactDetailScene extends StatefulWidget {
   const ArtifactDetailScene({Key? key}) : super(key: key);
@@ -13,18 +14,47 @@ class ArtifactDetailScene extends StatefulWidget {
 }
 
 class _ArtifactDetailScene extends State<ArtifactDetailScene> {
-  String description =
-      "Tyrannosaurus is a genus of large theropod dinosaur. The species Tyrannosaurus rex, often called T. rex or colloquially T-Rex, is one of the best represented theropods. It lived throughout what is now western North America, on what was then an island continent known as Laramidia.";
-
+  bool _isLoading = true;
+  String _appBarTitle = 'Loading...';
   Map<String, dynamic> data = jsonDecode(dttest);
   @override
   initState() {
     super.initState();
+    _isLoading = true;
+    fetchData();
   }
 
-  void openARView(){
-      Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const LocalAndWebObjectsView()));
+  Future fetchData() async {
+    // fetch data and update app bar title when done
+    final response = await http.get(Uri.parse(
+        'https://ar-dashboard.azurewebsites.net/api/guests/9ad8d313-2bd2-4263-9a24-c2b495ca70f9/2b798788-3eff-4bdf-ae1a-fd3c2637368f/38744d66-0978-4aae-a192-929321f92a2a'));
+    if (response.statusCode == 200) {
+      log("hiiii");
+      log(response.toString());
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      log(jsonData.toString());
+      var artifact = jsonData["artifact"];
+      var information = artifact["information"];
+      log("infor" + information);
+
+      setState(() {
+        _appBarTitle = 'Fetched Data';
+        _isLoading = false;
+        data = jsonDecode(information);
+      });
+    } else {
+      setState(() {
+        _appBarTitle = 'Error';
+        _isLoading = false;
+      });
+    }
+  }
+
+  void openARView() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const LocalAndWebObjectsView()));
   }
 
   Widget createWidgetByBlock(Map<String, dynamic> block) {
@@ -66,7 +96,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Brachiosaurus"),
+          title: Text(_appBarTitle),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () => Navigator.of(context).pop(),
@@ -81,22 +111,28 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
               },
             ),
           ]),
-      body: Container(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          color: Colors.white12,
-          child: ListView(
-              // This next line does the trick.
-              scrollDirection: Axis.vertical,
-              children: data['blocks']
-                  .map<Widget>((block) => createWidgetByBlock(block))
-                  .toList())),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          openARView();
-        },
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.view_in_ar),
-      ),
+      body:  
+          (_isLoading) ? 
+           const Center(child: CircularProgressIndicator())
+          :
+             Container(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                color: Colors.white12,
+                child: ListView(
+                    // This next line does the trick.
+                    scrollDirection: Axis.vertical,
+                    children: data['blocks']
+                        .map<Widget>((block) => createWidgetByBlock(block))
+                        .toList())),
+      floatingActionButton: Visibility(
+          visible: !_isLoading,
+          child: FloatingActionButton(
+            onPressed: () {
+              openARView();
+            },
+            backgroundColor: Colors.green,
+            child: const Icon(Icons.view_in_ar),
+          )),
     );
   }
 }
