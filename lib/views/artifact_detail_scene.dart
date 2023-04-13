@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:arcore_example/logic/text_handler.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
+import 'package:arcore_example/logic/artifact_favorite_mgr.dart';
 
 class ArtifactDetailScene extends StatefulWidget {
   const ArtifactDetailScene({Key? key}) : super(key: key);
@@ -15,12 +16,14 @@ class ArtifactDetailScene extends StatefulWidget {
 
 class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   bool _isLoading = true;
-  String _appBarTitle = 'Loading...';
+  String _appBarTitle = 'Đang tải';
   Map<String, dynamic> data = jsonDecode(dttest);
+  bool _isFavorite = false;
   @override
   initState() {
     super.initState();
     _isLoading = true;
+    _isFavorite = false;
     fetchData();
   }
 
@@ -92,6 +95,19 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     return Expanded(child: wg);
   }
 
+  void onClickFavorite() {
+    if (_isFavorite) {
+      // remove from favorite lists
+      ArtifactFavoriteMgr.remove("id");
+    } else {
+      // add to favorite list
+      ArtifactFavoriteMgr.remove("artifact");
+    }
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,27 +119,30 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
           ),
           actions: <Widget>[
             IconButton(
-              icon: const Icon(Icons.favorite),
+              icon: Icon((_isFavorite)
+                  ? Icons.favorite
+                  : Icons.favorite_border_outlined),
               tooltip: 'Thêm vào danh sách yêu thích',
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('This is a snackbar')));
+                onClickFavorite();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text((_isFavorite)
+                        ? 'Đã thêm vào danh sách yêu thích'
+                        : "Đã xóa khỏi danh sách yêu thích")));
               },
             ),
           ]),
-      body:  
-          (_isLoading) ? 
-           const Center(child: CircularProgressIndicator())
-          :
-             Container(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                color: Colors.white12,
-                child: ListView(
-                    // This next line does the trick.
-                    scrollDirection: Axis.vertical,
-                    children: data['blocks']
-                        .map<Widget>((block) => createWidgetByBlock(block))
-                        .toList())),
+      body: (_isLoading)
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              color: Colors.white12,
+              child: ListView(
+                  // This next line does the trick.
+                  scrollDirection: Axis.vertical,
+                  children: data['blocks']
+                      .map<Widget>((block) => createWidgetByBlock(block))
+                      .toList())),
       floatingActionButton: Visibility(
           visible: !_isLoading,
           child: FloatingActionButton(
