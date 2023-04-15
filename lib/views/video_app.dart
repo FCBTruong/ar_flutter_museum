@@ -40,7 +40,7 @@ class _VideoAppState extends State<VideoApp> {
               aspectRatio: _controller.value.aspectRatio,
               child: CustomVideoPlayer(customVideoPlayerController: _customVideoPlayerController),
             )
-          : Container(),
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 

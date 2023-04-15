@@ -5,7 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 class AudioPlayerBlock extends StatefulWidget {
   final String audioUrl;
 
-  AudioPlayerBlock({required this.audioUrl});
+   const AudioPlayerBlock({Key? key, required this.audioUrl}) : super(key: key);
 
   @override
   _AudioPlayerBlockState createState() => _AudioPlayerBlockState();
@@ -38,8 +38,7 @@ class _AudioPlayerBlockState extends State<AudioPlayerBlock> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
+    return  Center(
         child: IconButton(
           icon: Icon(audioPlayerState == PlayerState.playing ? Icons.pause : Icons.play_arrow),
           onPressed: () {
@@ -50,7 +49,6 @@ class _AudioPlayerBlockState extends State<AudioPlayerBlock> {
             }
           },
         ),
-      ),
-    );
+      );
   }
 }
