@@ -11,7 +11,8 @@ import 'package:arcore_example/logic/artifact_favorite_mgr.dart';
 import 'package:appinio_video_player/appinio_video_player.dart';
 
 class ArtifactDetailScene extends StatefulWidget {
-  const ArtifactDetailScene({Key? key}) : super(key: key);
+  final String url;
+  const ArtifactDetailScene({Key? key, required this.url}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ArtifactDetailScene();
@@ -40,7 +41,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   Future fetchData() async {
     // fetch data and update app bar title when done
     final response = await http.get(Uri.parse(
-        'https://ar-dashboard.azurewebsites.net/api/guests/9ad8d313-2bd2-4263-9a24-c2b495ca70f9/2b798788-3eff-4bdf-ae1a-fd3c2637368f/38744d66-0978-4aae-a192-929321f92a2a'));
+        widget.url));
     if (response.statusCode == 200) {
       log(response.toString());
       final Map<String, dynamic> jsonData = json.decode(response.body);
@@ -97,8 +98,26 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
           wg = Padding(
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
             child: Image.network(blData['file']['url'],
-            
-            ),
+                loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) {
+                return child;
+              }
+              return const Center(
+                child: SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: SizedBox(
+                      child: CircularProgressIndicator(
+                        // value: loadingProgress.expectedTotalBytes != null
+                        //     ? loadingProgress.cumulativeBytesLoaded /
+                        //         loadingProgress.expectedTotalBytes!
+                        //     : null,
+                      ),
+                      height: 20.0,
+                      width: 20.0,
+                    )),
+              );
+            }),
           );
           break;
         }

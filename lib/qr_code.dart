@@ -69,15 +69,21 @@ class _QRScanSceneState extends State<QRScanScene> {
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         result = scanData;
+        log('result' + result.toString());
 
-        var url = ""; // tod later
-       
-        // TODO
+        var url = "";
+        if (result != null) {
+          url = result!.code!;
+        }
+        log('url qrcode: ' + url);
+
         controller.dispose();
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const ArtifactDetailScene()));
+                builder: (context) => ArtifactDetailScene(
+                      url: url,
+                    )));
       });
     });
   }
