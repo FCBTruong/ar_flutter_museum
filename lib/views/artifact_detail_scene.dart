@@ -1,3 +1,4 @@
+import 'package:arcore_example/views/audio_player.dart';
 import 'package:arcore_example/views/localAndWebObjectsView.dart';
 import 'package:arcore_example/views/video_app.dart';
 import 'package:flutter/material.dart';
@@ -103,12 +104,9 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
       case 'video':
         {
           String url = blData['file']['url'];
-          wg = Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: VideoApp(url: url),
-          );
+          wg = AudioPlayerBlock(audioUrl: url); 
           break;
-        }
+      }
     }
     return Expanded(child: wg);
   }
