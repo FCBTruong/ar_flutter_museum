@@ -96,7 +96,9 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
         {
           wg = Padding(
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: Image.network(blData['file']['url']),
+            child: Image.network(blData['file']['url'],
+            
+            ),
           );
           break;
         }
