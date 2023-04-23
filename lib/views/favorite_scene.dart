@@ -35,10 +35,10 @@ class _FavoriteScene extends State<FavoriteScene> {
           children: ArtifactFavoriteMgr.listArtifacts
               .map<Widget>((artifactPackage) => Card(
                     clipBehavior: Clip.hardEdge,
-                    color: Color.fromARGB(255, 109, 109, 109),
+                    color: Color.fromARGB(255, 245, 245, 245),
                     child: InkWell(
                       splashColor:
-                          const Color.fromARGB(255, 61, 57, 57).withAlpha(30),
+                          Color.fromARGB(255, 153, 153, 153).withAlpha(30),
                       onTap: () {
                         openArtifact(artifactPackage);
                       },
@@ -51,7 +51,8 @@ class _FavoriteScene extends State<FavoriteScene> {
                                   child: Text(
                                 artifactPackage['artifact']['name'].toString(),
                                 style: const TextStyle(
-                                    fontSize: 16, color: Colors.white),
+                                  fontWeight: FontWeight.bold,
+                                    fontSize: 16, color: Colors.black),
                               )),
                               const SizedBox(
                                 height: 5,
@@ -62,7 +63,7 @@ class _FavoriteScene extends State<FavoriteScene> {
                                         .toString(),
                                     100),
                                 style: const TextStyle(
-                                    fontSize: 14, color: Colors.white),
+                                    fontSize: 14, color: Colors.black),
                                 overflow: TextOverflow.fade,
                               ),
                               Text(
@@ -73,13 +74,14 @@ class _FavoriteScene extends State<FavoriteScene> {
                                         : "",
                                     100),
                                 style: const TextStyle(
-                                    fontSize: 15, color: Colors.white),
+                                    fontSize: 15, color: Colors.black),
                                 overflow: TextOverflow.fade,
                               ),
                               Row(children: const [
                                Icon(Icons.museum_outlined,
                                     color: Colors.black),
-                                Text('British Museum')
+                                Text('British Museum',  style: TextStyle(
+                                    fontSize: 15, color: Colors.black),)
                               ])
                             ]),
                           )),

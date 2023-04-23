@@ -86,7 +86,8 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
 
     switch (block['type']) {
       case 'header':
-        wg = Text(
+        wg = Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10), child: Text(
           blData['text'],
           textAlign: TextAlign.center,
           style: const TextStyle(
@@ -94,7 +95,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
             fontWeight: FontWeight.bold,
             fontSize: 28,
           ),
-        );
+        ));
         break;
       case 'paragraph':
         {
