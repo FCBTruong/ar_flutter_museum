@@ -12,7 +12,9 @@ import 'package:appinio_video_player/appinio_video_player.dart';
 
 class ArtifactDetailScene extends StatefulWidget {
   final String url;
-  const ArtifactDetailScene({Key? key, required this.url}) : super(key: key);
+  final dynamic artifactPackage;
+  const ArtifactDetailScene({Key? key, required this.url, this.artifactPackage})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ArtifactDetailScene();
@@ -21,12 +23,11 @@ class ArtifactDetailScene extends StatefulWidget {
 class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   bool _isLoading = true;
   String _appBarTitle = 'Đang tải';
-  Map<String, dynamic> data = {};
+  Map<String, dynamic> information = {};
   bool _isFavorite = false;
-  List<CustomVideoPlayerController> _videoControllers = [];
-  int _videoIdx = 0;
-  late CustomVideoPlayerController _customVideoPlayerController;
   late VideoPlayerController videoPlayerController;
+  dynamic artifact;
+  dynamic artifactPackage;
 
   @override
   initState() {
@@ -34,33 +35,41 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     _isLoading = true;
     _isFavorite = false;
     fetchData();
-    _videoControllers = [];
-    _videoIdx = 0;
   }
 
   Future fetchData() async {
     // fetch data and update app bar title when done
-    final response = await http.get(Uri.parse(
-        widget.url));
-    if (response.statusCode == 200) {
-      log(response.toString());
-      final Map<String, dynamic> jsonData = json.decode(response.body);
-      log(jsonData.toString());
-      var artifact = jsonData["artifact"];
-      var information = artifact["information"];
-      log("infor" + information);
-
-      setState(() {
-        _appBarTitle = 'Fetched Data';
-        _isLoading = false;
-        data = jsonDecode(information);
-      });
+    if (widget.url != "") {
+      final response = await http.get(Uri.parse(widget.url));
+      if (response.statusCode == 200) {
+        log(response.toString());
+        artifactPackage = json.decode(response.body);
+        log(artifactPackage.toString());
+        artifact = artifactPackage["artifact"];
+        onDoneData();
+      } else {
+        setState(() {
+          _appBarTitle = 'Error';
+          _isLoading = false;
+        });
+      }
     } else {
-      setState(() {
-        _appBarTitle = 'Error';
-        _isLoading = false;
-      });
+      artifactPackage = widget.artifactPackage;
+      artifact = artifactPackage["artifact"];
+      onDoneData();
     }
+  }
+
+  void onDoneData() {
+    var info = artifact["information"];
+
+    _isFavorite = ArtifactFavoriteMgr.isFavorite(artifactPackage['id']);
+
+    setState(() {
+      _appBarTitle = '';
+      _isLoading = false;
+      information = jsonDecode(info);
+    });
   }
 
   void openARView() {
@@ -102,20 +111,22 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
               if (loadingProgress == null) {
                 return child;
               }
-              return const Center(
-                child: SizedBox(
-                    width: 150,
-                    height: 150,
-                    child: SizedBox(
-                      child: CircularProgressIndicator(
-                        // value: loadingProgress.expectedTotalBytes != null
-                        //     ? loadingProgress.cumulativeBytesLoaded /
-                        //         loadingProgress.expectedTotalBytes!
-                        //     : null,
-                      ),
-                      height: 20.0,
-                      width: 20.0,
-                    )),
+              return Center(
+                child: DecoratedBox(
+                    decoration: BoxDecoration(color: Colors.grey[200]),
+                    child: const SizedBox(
+                        width: double.infinity,
+                        height: 200,
+                        child: Center(child: SizedBox(
+                          height: 30.0,
+                          width: 30.0,
+                          child: CircularProgressIndicator(
+                              // value: loadingProgress.expectedTotalBytes != null
+                              //     ? loadingProgress.cumulativeBytesLoaded /
+                              //         loadingProgress.expectedTotalBytes!
+                              //     : null,
+                              ),
+                        )))),
               );
             }),
           );
@@ -141,10 +152,10 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   void onClickFavorite() {
     if (_isFavorite) {
       // remove from favorite lists
-      ArtifactFavoriteMgr.remove("id");
+      ArtifactFavoriteMgr.remove(artifactPackage['id']);
     } else {
       // add to favorite list
-      ArtifactFavoriteMgr.remove("artifact");
+      ArtifactFavoriteMgr.add(artifactPackage);
     }
     setState(() {
       _isFavorite = !_isFavorite;
@@ -183,7 +194,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
               child: ListView(
                   // This next line does the trick.
                   scrollDirection: Axis.vertical,
-                  children: data['blocks']
+                  children: information['blocks']
                       .map<Widget>((block) => createWidgetByBlock(block))
                       .toList())),
       floatingActionButton: Visibility(

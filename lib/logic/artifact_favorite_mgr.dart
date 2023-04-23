@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -21,14 +23,23 @@ class ArtifactFavoriteMgr {
     prefs.setStringList('favorite_artifacts', listJson);
   }
 
-  static bool add(Map<String, dynamic> artifact){
-    // TODO
+  static bool add(Map<String, dynamic> artifactPackage) {
+    if(isFavorite(artifactPackage['id'])){
+      return false;
+    }
+    listArtifacts.add(artifactPackage);
+    saveFavorites();
 
     return true;
   }
-   static bool remove(String artifactId){
-    // TODO
 
+  static bool remove(String artifactId) {
+    listArtifacts.removeWhere((element) => element['id'] == artifactId);
+    saveFavorites();
     return true;
+  }
+
+  static bool isFavorite(String artifactId) {
+    return listArtifacts.any((element) => element['id'] == artifactId);
   }
 }

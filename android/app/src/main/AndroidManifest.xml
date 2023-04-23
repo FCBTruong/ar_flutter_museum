@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.arcore_example">
    <application
-        android:label="arcore_example"
+        android:label="Museums Connect"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

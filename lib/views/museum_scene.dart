@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:maps_launcher/maps_launcher.dart';
 
 class MuseumScene extends StatefulWidget {
   const MuseumScene({Key? key}) : super(key: key);
@@ -14,12 +15,130 @@ class _MuseumScene extends State<MuseumScene> {
     super.initState();
   }
 
+  var museums = ["abc"];
+
+  void onViewMorePressed() {}
+  void onContactPressed() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          color: Colors.white24,
-        ));
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+      color: Colors.white24,
+      child: ListView(
+          children: museums
+              .map<Widget>((museum) => MuseumCard(
+                  title: "Bảo tàng Hồ Chí Minh",
+                  image:
+                      "https://museumfiles.blob.core.windows.net/users/f7424a9c-2608-4fd9-9037-9daed5872967/f9af05c4-b065-4291-8fcb-96e6633bb4b0.jpeg",
+                  address: "54A Nguyễn Chí Thanh, Đống Đa, Hà Nội",
+                  openingTime: "8:00AM-5:00PM",
+                  onViewMorePressed: onViewMorePressed,
+                  onContactPressed: onContactPressed))
+              .toList()),
+    ));
+  }
+}
+
+class MuseumCard extends StatelessWidget {
+  final String title;
+  final String image;
+  final String address;
+  final String openingTime;
+  final VoidCallback onViewMorePressed;
+  final VoidCallback onContactPressed;
+
+  MuseumCard({
+    required this.title,
+    required this.image,
+    required this.address,
+    required this.openingTime,
+    required this.onViewMorePressed,
+    required this.onContactPressed,
+  });
+
+  void openDirection() {
+    MapsLauncher.launchQuery(address);
+
+    // MapsLauncher.launchCoordinates(37.4220041, -122.0862462);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(title,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      textAlign: TextAlign.center),
+                ),
+                Image.network(image,
+                    loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+                  return Center(
+                    child: DecoratedBox(
+                        decoration: BoxDecoration(color: Colors.grey[200]),
+                        child: const SizedBox(
+                            width: double.infinity,
+                            height: 200,
+                            child: Center(
+                                child: SizedBox(
+                              height: 30.0,
+                              width: 30.0,
+                              child: CircularProgressIndicator(
+                                  // value: loadingProgress.expectedTotalBytes != null
+                                  //     ? loadingProgress.cumulativeBytesLoaded /
+                                  //         loadingProgress.expectedTotalBytes!
+                                  //     : null,
+                                  ),
+                            )))),
+                  );
+                }),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on),
+                    Text(address),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_filled_rounded),
+                    Text(openingTime),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: onContactPressed,
+                      label: const Text('Tham quan'),
+                      icon: const Icon(Icons.airplane_ticket_rounded),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: openDirection,
+                      label: const Text('Chỉ đường'),
+                      icon: const Icon(Icons.directions),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

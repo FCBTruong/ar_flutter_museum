@@ -2,8 +2,10 @@ import 'package:arcore_example/views/homeView.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
+import 'package:arcore_example/logic/artifact_favorite_mgr.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  ArtifactFavoriteMgr.init();
   runApp(const MyApp());
 }
 
