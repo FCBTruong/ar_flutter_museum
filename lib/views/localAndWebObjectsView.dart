@@ -108,7 +108,43 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       setState(() {
         isLoading = false;
       });
+      onEffectAR();
     }
+  }
+
+  void onEffectAR() {
+    // sounds
+  }
+
+  Future<void> onTakeScreenshot() async {
+    var image = await arSessionManager!.snapshot();
+    await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              insetPadding: const EdgeInsets.all(0),
+              content: FractionallySizedBox(
+                widthFactor: 1.0,
+                heightFactor: 1.0,
+                child: Container(
+                    decoration: BoxDecoration(
+                        image:
+                            DecorationImage(image: image, fit: BoxFit.cover))),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    // TODO: Add save logic here
+                  },
+                  child: const Text('Lưu'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Đóng'),
+                ),
+              ],
+            ));
   }
 
   @override
@@ -121,73 +157,99 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Expanded(
-                child: SizedBox(
-              child: isViewingDetail
-                  ? Container(
-                      padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
-                      color: Colors.white12,
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(0),
-                      child: Container(
-                          color: Colors.black,
-                          child: isTest
-                              ? Container()
-                              : Stack(children: <Widget>[
-                                  ARView(
-                                    onARViewCreated: onARViewCreated,
-                                  ),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    child: isLoading
-                                        ? Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                                Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 20,
-                                                            right: 20),
-                                                    child:
-                                                        LinearProgressIndicator(
-                                                      backgroundColor:
-                                                          Colors.grey[300],
-                                                    )),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                const Text(
-                                                  'Đang tải mô hình 3D...',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const Text(
-                                                  'Bạn nên hướng camera vào khu vực rộng để có trải nghiệm tốt nhất',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.normal),
-                                                )
-                                              ])
-                                        : Container(),
-                                  ),
-                                ])),
-                    ),
-            )),
-          ],
+      body: Stack(children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                  child: SizedBox(
+                child: isViewingDetail
+                    ? Container(
+                        padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
+                        color: Colors.white12,
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(0),
+                        child: Container(
+                            color: Colors.black,
+                            child: isTest
+                                ? Container()
+                                : Stack(children: <Widget>[
+                                    ARView(
+                                      onARViewCreated: onARViewCreated,
+                                    ),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      child: isLoading
+                                          ? Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 20,
+                                                              right: 20),
+                                                      child:
+                                                          LinearProgressIndicator(
+                                                        backgroundColor:
+                                                            Colors.grey[300],
+                                                      )),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  const Text(
+                                                    'Đang tải mô hình 3D...',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  const Text(
+                                                    'Bạn nên hướng camera vào khu vực rộng để có trải nghiệm tốt nhất',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                                  )
+                                                ])
+                                          : Container(),
+                                    ),
+                                  ])),
+                      ),
+              )),
+            ],
+          ),
         ),
-      ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    onTakeScreenshot();
+                  },
+                ),
+              )),
+        ),
+      ]),
     );
   }
 }
