@@ -29,6 +29,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   late VideoPlayerController videoPlayerController;
   dynamic artifact;
   dynamic artifactPackage;
+  bool _isCachedData = false;
 
   @override
   initState() {
@@ -36,6 +37,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     _isLoading = true;
     _isFavorite = false;
     _isHasAR = false;
+    _isCachedData = widget.artifactPackage != null;
     fetchData();
   }
 
@@ -48,6 +50,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
         artifactPackage = json.decode(response.body);
         log("artifactPkg " + artifactPackage.toString());
         artifact = artifactPackage["artifact"];
+
         onDoneData();
       } else {
         setState(() {
@@ -68,6 +71,10 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     _isFavorite = ArtifactFavoriteMgr.isFavorite(artifactPackage['id']);
     _isHasAR = artifact['modelAr'] != null && artifact['modelAr'] != "" &&
         artifact['modelAr']['modelAsset'] != null;
+
+    if(_isFavorite && !_isCachedData){
+      ArtifactFavoriteMgr.update(artifactPackage);
+    }
 
     setState(() {
       _appBarTitle = '';

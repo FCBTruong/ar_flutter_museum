@@ -33,6 +33,16 @@ class ArtifactFavoriteMgr {
     return true;
   }
 
+  static bool update(Map<String, dynamic> artifactPackage){
+    if(!isFavorite(artifactPackage['id'])){
+      return false;
+    }
+    listArtifacts.removeWhere((element) => element['id'] == artifactPackage['id']);
+    listArtifacts.add(artifactPackage);
+    saveFavorites();
+    return true;
+  }
+
   static bool remove(String artifactId) {
     listArtifacts.removeWhere((element) => element['id'] == artifactId);
     saveFavorites();
