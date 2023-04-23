@@ -84,14 +84,3 @@ class _MyHomePage extends State<MyHomePage> {
     ));
   }
 }
-
-// Center(
-//           child: ElevatedButton(
-//               onPressed: () {
-//                 Navigator.push(
-//                     context,
-//                     MaterialPageRoute(
-//                         builder: (context) => const LocalAndWebObjectsView()));
-//               },
-//               child: const Text("Local / Web Objects")),
-//         )

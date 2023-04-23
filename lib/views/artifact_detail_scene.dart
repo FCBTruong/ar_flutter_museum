@@ -22,6 +22,7 @@ class ArtifactDetailScene extends StatefulWidget {
 
 class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   bool _isLoading = true;
+  bool _isHasAR = false;
   String _appBarTitle = 'Đang tải';
   Map<String, dynamic> information = {};
   bool _isFavorite = false;
@@ -34,6 +35,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     super.initState();
     _isLoading = true;
     _isFavorite = false;
+    _isHasAR = false;
     fetchData();
   }
 
@@ -44,7 +46,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
       if (response.statusCode == 200) {
         log(response.toString());
         artifactPackage = json.decode(response.body);
-        log(artifactPackage.toString());
+        log("artifactPkg " + artifactPackage.toString());
         artifact = artifactPackage["artifact"];
         onDoneData();
       } else {
@@ -64,6 +66,8 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     var info = artifact["information"];
 
     _isFavorite = ArtifactFavoriteMgr.isFavorite(artifactPackage['id']);
+    _isHasAR = artifact['modelAr'] != null && artifact['modelAr'] != "" &&
+        artifact['modelAr']['modelAsset'] != null;
 
     setState(() {
       _appBarTitle = '';
@@ -76,7 +80,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => const LocalAndWebObjectsView()));
+            builder: (context) => LocalAndWebObjectsView(artifact: artifact)));
   }
 
   Widget createWidgetByBlock(Map<String, dynamic> block) {
@@ -199,7 +203,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
                       .map<Widget>((block) => createWidgetByBlock(block))
                       .toList())),
       floatingActionButton: Visibility(
-          visible: !_isLoading,
+          visible: !_isLoading && _isHasAR,
           child: FloatingActionButton(
             onPressed: () {
               openARView();

@@ -12,7 +12,9 @@ import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'dart:developer';
 
 class LocalAndWebObjectsView extends StatefulWidget {
-  const LocalAndWebObjectsView({Key? key}) : super(key: key);
+  final dynamic artifact;
+  const LocalAndWebObjectsView({Key? key, required this.artifact})
+      : super(key: key);
 
   @override
   State<LocalAndWebObjectsView> createState() => _LocalAndWebObjectsViewState();
@@ -30,6 +32,9 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   ARNode? webObjectNode;
   bool isTest = false;
   bool isViewingDetail = false;
+  dynamic modelAsset;
+  dynamic modelAr;
+  bool isLoading = false;
 
   void onARViewCreated(
       ARSessionManager arSessionManager,
@@ -51,7 +56,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     // 3
     this.arObjectManager.onInitialize();
 
-    onLocalObjectButtonPressed();
+    onWebObjectAtButtonPressed();
   }
 
   Future<void> onLocalObjectButtonPressed() async {
@@ -75,17 +80,34 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   }
 
   Future<void> onWebObjectAtButtonPressed() async {
+    log('artifaceModelAr' + widget.artifact['modelAr'].toString());
+
+    modelAr = widget.artifact['modelAr'];
+    modelAsset = modelAr['modelAsset'];
+
+    if (modelAsset == null) {
+      log('modelAsset is null');
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+
     if (webObjectNode != null) {
       arObjectManager.removeNode(webObjectNode!);
       webObjectNode = null;
     } else {
       var newNode = ARNode(
           type: NodeType.webGLB,
-          uri:
-              "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-          scale: Vector3(0.2, 0.2, 0.2));
+          uri: modelAsset['url'],
+          position: Vector3(0, 0, -0.5),
+          scale: Vector3(modelAr['scale']['x'], modelAr['scale']['y'],
+              modelAr['scale']['z']));
       bool? didAddWebNode = await arObjectManager.addNode(newNode);
       webObjectNode = (didAddWebNode!) ? newNode : null;
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -93,7 +115,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Brachiosaurus"),
+        title: Text(widget.artifact['name']),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
@@ -117,9 +139,50 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                           color: Colors.black,
                           child: isTest
                               ? Container()
-                              : ARView(
-                                  onARViewCreated: onARViewCreated,
-                                )),
+                              : Stack(children: <Widget>[
+                                  ARView(
+                                    onARViewCreated: onARViewCreated,
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: isLoading
+                                        ? Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                                Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 20,
+                                                            right: 20),
+                                                    child:
+                                                        LinearProgressIndicator(
+                                                      backgroundColor:
+                                                          Colors.grey[300],
+                                                    )),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                const Text(
+                                                  'Đang tải mô hình 3D...',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const Text(
+                                                  'Bạn nên hướng camera vào khu vực rộng để có trải nghiệm tốt nhất',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.normal),
+                                                )
+                                              ])
+                                        : Container(),
+                                  ),
+                                ])),
                     ),
             )),
           ],
