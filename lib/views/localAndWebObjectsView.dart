@@ -9,6 +9,7 @@ import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'package:ar_flutter_plugin/datatypes/node_types.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
+import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'dart:developer';
 
 class LocalAndWebObjectsView extends StatefulWidget {
@@ -216,7 +217,16 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                                                         fontSize: 16,
                                                         fontWeight:
                                                             FontWeight.normal),
-                                                  )
+                                                  ),
+                                                  ModelViewer(
+                                                    src:
+                                                        'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+                                                    alt:
+                                                        "A 3D model of an astronaut",
+                                                    ar: true,
+                                                    autoRotate: true,
+                                                    cameraControls: true,
+                                                  ),
                                                 ])
                                           : Container(),
                                     ),

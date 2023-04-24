@@ -1,4 +1,5 @@
 # This is a generated file; do not edit or check into version control.
+android_intent_plus=/Users/lap60576-local/.pub-cache/hosted/pub.dev/android_intent_plus-3.1.7/
 ar_flutter_plugin=/Users/lap60576-local/.pub-cache/hosted/pub.dev/ar_flutter_plugin-0.7.3/
 audioplayers=/Users/lap60576-local/.pub-cache/hosted/pub.dev/audioplayers-3.0.1/
 audioplayers_android=/Users/lap60576-local/.pub-cache/hosted/pub.dev/audioplayers_android-2.0.0/
@@ -39,9 +40,6 @@ video_player=/Users/lap60576-local/.pub-cache/hosted/pub.dev/video_player-2.6.1/
 video_player_android=/Users/lap60576-local/.pub-cache/hosted/pub.dev/video_player_android-2.4.4/
 video_player_avfoundation=/Users/lap60576-local/.pub-cache/hosted/pub.dev/video_player_avfoundation-2.4.4/
 video_player_web=/Users/lap60576-local/.pub-cache/hosted/pub.dev/video_player_web-2.0.16/
-wakelock=/Users/lap60576-local/.pub-cache/hosted/pub.dev/wakelock-0.6.2/
-wakelock_macos=/Users/lap60576-local/.pub-cache/hosted/pub.dev/wakelock_macos-0.4.0/
-wakelock_web=/Users/lap60576-local/.pub-cache/hosted/pub.dev/wakelock_web-0.4.0/
-webview_flutter=/Users/lap60576-local/.pub-cache/hosted/pub.dev/webview_flutter-2.8.0/
+webview_flutter=/Users/lap60576-local/.pub-cache/hosted/pub.dev/webview_flutter-3.0.4/
 webview_flutter_android=/Users/lap60576-local/.pub-cache/hosted/pub.dev/webview_flutter_android-2.10.4/
 webview_flutter_wkwebview=/Users/lap60576-local/.pub-cache/hosted/pub.dev/webview_flutter_wkwebview-2.9.5/
