@@ -9,8 +9,8 @@ import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'package:ar_flutter_plugin/datatypes/node_types.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
-import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'dart:developer';
+
 
 class LocalAndWebObjectsView extends StatefulWidget {
   final dynamic artifact;
@@ -31,7 +31,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
 
 //String webObjectReference;
   ARNode? webObjectNode;
-  bool isTest = false;
+  bool isTest = true;
   bool isViewingDetail = false;
   dynamic modelAsset;
   dynamic modelAr;
@@ -176,7 +176,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                         child: Container(
                             color: Colors.black,
                             child: isTest
-                                ? Container()
+                                ? WithARkitScreen()
                                 : Stack(children: <Widget>[
                                     ARView(
                                       onARViewCreated: onARViewCreated,

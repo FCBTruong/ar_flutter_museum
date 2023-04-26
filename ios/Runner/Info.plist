@@ -43,6 +43,8 @@
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key><true/>
+        <key>io.flutter.embedded_views_preview</key>
+        <string>YES</string>
     </dict>
 </dict>
 </plist>
