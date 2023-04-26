@@ -10,6 +10,7 @@ import 'package:ar_flutter_plugin/datatypes/node_types.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'dart:developer';
+import 'package:arcore_example/views/unity_ar_view.dart';
 
 
 class LocalAndWebObjectsView extends StatefulWidget {
@@ -72,7 +73,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
           type: NodeType.localGLTF2,
           uri: "assets/Chicken_01/phoenix_bird.glb",
           scale: Vector3(2, 2, 2),
-          position: Vector3(0, -0.5, -0.5),
+          position: Vector3(0, -0.5, -0.5), 
           rotation: Vector4(1.0, 0.0, 0.0, 0.0));
       // 3
       bool? didAddLocalNode = await arObjectManager.addNode(newNode);

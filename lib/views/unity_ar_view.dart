@@ -8,10 +8,10 @@ class WithARkitScreen extends StatefulWidget {
 }
 
 class CustomPopupMenu {
-  CustomPopupMenu({this.title, this.scene});
+  CustomPopupMenu({required this.title, required this.scene});
 
-  String title;
-  int scene;
+  final String title;
+  final int scene;
 }
 
 List<CustomPopupMenu> choices = <CustomPopupMenu>[
@@ -39,7 +39,7 @@ class _WithARkitScreenState extends State<WithARkitScreen> {
 
   static final GlobalKey<ScaffoldState> _scaffoldKey =
   GlobalKey<ScaffoldState>();
-  UnityWidgetController _unityWidgetController;
+  late UnityWidgetController _unityWidgetController;
   double _sliderValue = 0.0;
 
   CustomPopupMenu _selectedChoices = choices[0];
@@ -98,9 +98,7 @@ class _WithARkitScreenState extends State<WithARkitScreen> {
         child: Stack(
           children: <Widget>[
             UnityWidget(
-              onUnityViewCreated: onUnityCreated,
-              isARScene: false,
-              onUnityMessage: onUnityMessage,
+             onUnityCreated: onUnityCreated,
             ),
           ],
         ),
