@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'package:arcore_example/logic/api.dart';
+import 'dart:developer';
 
 class MuseumScene extends StatefulWidget {
   const MuseumScene({Key? key}) : super(key: key);
@@ -13,31 +16,54 @@ class _MuseumScene extends State<MuseumScene> {
   @override
   initState() {
     super.initState();
+    fetchData();
   }
 
-  var museums = ["abc"];
+  bool _isLoading = false;
+  dynamic museums;
 
   void onViewMorePressed() {}
   void onContactPressed() {}
+  void fetchData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final response = await http.get(Uri.parse(publicMuseumsUrl));
+    if (response.statusCode == 200) {
+      log("museums: .. " + response.toString());
+      var museumsInformation = json.decode(response.body);
+
+      setState(() {
+        museums = museumsInformation['museums'];
+        _isLoading = false;
+      });
+    } else {
+      log('error with fetching: ' + publicMuseumsUrl);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-      color: Colors.white24,
-      child: ListView(
-          children: museums
-              .map<Widget>((museum) => MuseumCard(
-                  title: "Bảo tàng Hồ Chí Minh",
-                  image:
-                      "https://museumfiles.blob.core.windows.net/users/f7424a9c-2608-4fd9-9037-9daed5872967/f9af05c4-b065-4291-8fcb-96e6633bb4b0.jpeg",
-                  address: "54A Nguyễn Chí Thanh, Đống Đa, Hà Nội",
-                  openingTime: "8:00AM-5:00PM",
-                  onViewMorePressed: onViewMorePressed,
-                  onContactPressed: onContactPressed))
-              .toList()),
-    ));
+        body: (_isLoading)
+            ? const Center(child: CircularProgressIndicator())
+            : Container(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                color: Colors.white24,
+                child: ListView(
+                    children: museums
+                        .map<Widget>((museum) => MuseumCard(
+                            title: museum['name'] ?? "Chưa cập nhật",
+                            image: museum['imageUrl'] ??
+                                "https://www.abc.net.au/news/image/117200-3x2-940x627.jpg",
+                            address: museum['address'] ?? "Chưa cập nhật",
+                            openingTime:
+                                museum['openingTime'] ?? "Chưa cập nhật",
+                            onViewMorePressed: onViewMorePressed,
+                            onContactPressed: onContactPressed))
+                        .toList()),
+              ));
   }
 }
 
@@ -80,42 +106,52 @@ class MuseumCard extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                       textAlign: TextAlign.center),
                 ),
-                Image.network(image,
-                    loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-                  return Center(
-                    child: DecoratedBox(
-                        decoration: BoxDecoration(color: Colors.grey[200]),
-                        child: const SizedBox(
-                            width: double.infinity,
-                            height: 200,
-                            child: Center(
-                                child: SizedBox(
-                              height: 30.0,
-                              width: 30.0,
-                              child: CircularProgressIndicator(
-                                  // value: loadingProgress.expectedTotalBytes != null
-                                  //     ? loadingProgress.cumulativeBytesLoaded /
-                                  //         loadingProgress.expectedTotalBytes!
-                                  //     : null,
-                                  ),
-                            )))),
-                  );
-                }),
+                const SizedBox(height: 8),
+                image != ""
+                    ? Image.network(image,
+                        loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Center(
+                          child: DecoratedBox(
+                              decoration:
+                                  BoxDecoration(color: Colors.grey[200]),
+                              child: const SizedBox(
+                                  width: double.infinity,
+                                  height: 200,
+                                  child: Center(
+                                      child: SizedBox(
+                                    height: 30.0,
+                                    width: 30.0,
+                                    child: CircularProgressIndicator(
+                                        // value: loadingProgress.expectedTotalBytes != null
+                                        //     ? loadingProgress.cumulativeBytesLoaded /
+                                        //         loadingProgress.expectedTotalBytes!
+                                        //     : null,
+                                        ),
+                                  )))),
+                        );
+                      })
+                    : Container(),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     const Icon(Icons.location_on),
-                    Text(address),
+                    Expanded(
+                        child: Text(
+                      address,
+                    )),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     const Icon(Icons.access_time_filled_rounded),
-                    Text(openingTime),
+                    Expanded(
+                        child: Text(
+                      openingTime,
+                    )),
                   ],
                 ),
                 const SizedBox(height: 8),

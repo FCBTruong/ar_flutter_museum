@@ -218,15 +218,6 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                                                         fontWeight:
                                                             FontWeight.normal),
                                                   ),
-                                                  ModelViewer(
-                                                    src:
-                                                        'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
-                                                    alt:
-                                                        "A 3D model of an astronaut",
-                                                    ar: true,
-                                                    autoRotate: true,
-                                                    cameraControls: true,
-                                                  ),
                                                 ])
                                           : Container(),
                                     ),
