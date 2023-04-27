@@ -27,6 +27,7 @@
 .pub-cache/
 .pub/
 build/*
+Builds/*
 
 android/UnityExport/
 ios/UnityExport/

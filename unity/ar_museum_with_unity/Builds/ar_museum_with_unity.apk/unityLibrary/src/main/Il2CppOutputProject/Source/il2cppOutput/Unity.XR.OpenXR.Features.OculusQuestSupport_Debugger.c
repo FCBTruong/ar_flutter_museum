@@ -34,11 +34,11 @@ static const Il2CppMethodExecutionContextInfoIndex g_methodExecutionContextInfoI
 IL2CPP_EXTERN_C Il2CppSequencePoint g_sequencePointsUnity_XR_OpenXR_Features_OculusQuestSupport[];
 Il2CppSequencePoint g_sequencePointsUnity_XR_OpenXR_Features_OculusQuestSupport[5] = 
 {
-	{ 45197, 0, 0, 0, 0, 0, -1, kSequencePointKind_Normal, 0, 0 } /* seqPointIndex: 0 */,
-	{ 45197, 0, 0, 0, 0, 0, 16777215, kSequencePointKind_Normal, 0, 1 } /* seqPointIndex: 1 */,
-	{ 45197, 1, 40, 40, 9, 40, 0, kSequencePointKind_Normal, 0, 2 } /* seqPointIndex: 2 */,
-	{ 45197, 1, 44, 44, 9, 41, 7, kSequencePointKind_Normal, 0, 3 } /* seqPointIndex: 3 */,
-	{ 45197, 1, 44, 44, 9, 41, 15, kSequencePointKind_StepOut, 0, 4 } /* seqPointIndex: 4 */,
+	{ 45225, 0, 0, 0, 0, 0, -1, kSequencePointKind_Normal, 0, 0 } /* seqPointIndex: 0 */,
+	{ 45225, 0, 0, 0, 0, 0, 16777215, kSequencePointKind_Normal, 0, 1 } /* seqPointIndex: 1 */,
+	{ 45225, 1, 40, 40, 9, 40, 0, kSequencePointKind_Normal, 0, 2 } /* seqPointIndex: 2 */,
+	{ 45225, 1, 44, 44, 9, 41, 7, kSequencePointKind_Normal, 0, 3 } /* seqPointIndex: 3 */,
+	{ 45225, 1, 44, 44, 9, 41, 15, kSequencePointKind_StepOut, 0, 4 } /* seqPointIndex: 4 */,
 };
 #else
 extern Il2CppSequencePoint g_sequencePointsUnity_XR_OpenXR_Features_OculusQuestSupport[];
@@ -60,7 +60,7 @@ static const Il2CppSequencePointSourceFile g_sequencePointSourceFiles[1] = { NUL
 #if IL2CPP_MONO_DEBUGGER
 static const Il2CppTypeSourceFilePair g_typeSourceFiles[1] = 
 {
-	{ 6270, 1 },
+	{ 6284, 1 },
 };
 #else
 static const Il2CppTypeSourceFilePair g_typeSourceFiles[1] = { { 0, 0 } };

@@ -67,28 +67,6 @@ class _WithARkitScreenState extends State<WithARkitScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('ARKIT Demo'),
-        actions: <Widget>[
-          PopupMenuButton<CustomPopupMenu>(
-            elevation: 3.2,
-            initialValue: choices[1],
-            onCanceled: () {
-              print('You have not chossed anything');
-            },
-            tooltip: 'This is tooltip',
-            onSelected: _select,
-            itemBuilder: (BuildContext context) {
-              return choices.map((CustomPopupMenu choice) {
-                return PopupMenuItem<CustomPopupMenu>(
-                  value: choice,
-                  child: Text(choice.title),
-                );
-              }).toList();
-            },
-          )
-        ],
-      ),
       body:Card(
         margin: const EdgeInsets.all(8),
         clipBehavior: Clip.antiAlias,

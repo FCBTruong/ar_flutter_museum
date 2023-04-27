@@ -8,6 +8,7 @@ import 'package:arcore_example/qr_code.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'favorite_scene.dart';
 import 'video_app.dart';
+import 'unity_ar_view.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -47,7 +48,7 @@ class _MyHomePage extends State<MyHomePage> {
         break;
       case 2:
         setState(() {
-          _currentScreen = const FavoriteScene();
+          _currentScreen = WithARkitScreen();
           title = "Yêu thích";
         });
         break;
