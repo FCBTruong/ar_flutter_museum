@@ -47,10 +47,15 @@ class _MyHomePage extends State<MyHomePage> {
         });
         break;
       case 2:
-        setState(() {
-          _currentScreen = WithARkitScreen();
-          title = "Yêu thích";
-        });
+        // setState(() {
+        //   _currentScreen = const FavoriteScene();
+        //   title = "Yêu thích";
+        // });
+
+          Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => WithARkitScreen()));
         break;
     }
   }
