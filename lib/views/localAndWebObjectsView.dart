@@ -15,6 +15,7 @@ import 'package:ar_flutter_plugin/models/ar_hittest_result.dart';
 import 'package:ar_flutter_plugin/models/ar_anchor.dart';
 import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'dart:developer';
+import 'dart:ui';
 
 class LocalAndWebObjectsView extends StatefulWidget {
   final dynamic artifact;
@@ -44,8 +45,9 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   dynamic modelAsset;
   dynamic modelAr;
   bool isLoading = false;
+  bool hasTapped = false;
 
-   @override
+  @override
   void dispose() {
     super.dispose();
     arSessionManager!.dispose();
@@ -81,7 +83,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     this.arObjectManager!.onRotationStart = onRotationStarted;
     this.arObjectManager!.onRotationChange = onRotationChanged;
     this.arObjectManager!.onRotationEnd = onRotationEnded;
-   // onWebObjectAtButtonPressed();
+    // onWebObjectAtButtonPressed();
   }
 
   Future<void> onLocalObjectButtonPressed() async {
@@ -104,9 +106,11 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     }
   }
 
-  Future<void> onWebObjectAtButtonPressed() async {
-    log('artifaceModelAr' + widget.artifact['modelAr'].toString());
-
+  Future<void> onPlaneOrPointTapped(
+      List<ARHitTestResult> hitTestResults) async {
+    if (nodes.length == 1) {
+      return;
+    }
     modelAr = widget.artifact['modelAr'];
     modelAsset = modelAr['modelAsset'];
 
@@ -115,41 +119,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       return;
     }
     setState(() {
-      isLoading = true;
-    });
-
-    if (webObjectNode != null) {
-      arObjectManager.removeNode(webObjectNode!);
-      webObjectNode = null;
-    } else {
-      var newNode = ARNode(
-          type: NodeType.webGLB,
-          uri: modelAsset['url'],
-          position: Vector3(0, 0, -0.5),
-          scale: Vector3(modelAr['scale']['x'], modelAr['scale']['y'],
-              modelAr['scale']['z']));
-      bool? didAddWebNode = await arObjectManager.addNode(newNode);
-      webObjectNode = (didAddWebNode!) ? newNode : null;
-      setState(() {
-        isLoading = false;
-      });
-      onEffectAR();
-    }
-  }
-
-   Future<void> onPlaneOrPointTapped(
-      List<ARHitTestResult> hitTestResults) async {
-        if(this.nodes.length == 1){
-          return;
-        }
-       modelAr = widget.artifact['modelAr'];
-       modelAsset = modelAr['modelAsset'];
-
-    if (modelAsset == null) {
-      log('modelAsset is null');
-      return;
-    }
-    setState(() {
+      hasTapped = true;
       isLoading = true;
     });
     var singleHitTestResult = hitTestResults.firstWhere(
@@ -163,14 +133,16 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         // Add note to anchor
         var newNode = ARNode(
             type: NodeType.webGLB,
-            uri:
-                modelAsset['url'],
-            scale: Vector3(modelAr['scale']['x'].toDouble(), modelAr['scale']['y'].toDouble(),
-              modelAr['scale']['z'].toDouble()),
+            uri: modelAsset['url'],
+            scale: Vector3(
+                modelAr['scale']['x'].toDouble(),
+                modelAr['scale']['y'].toDouble(),
+                modelAr['scale']['z'].toDouble()),
             position: Vector3(0.0, 0.0, 0.0),
             rotation: Vector4(1.0, 0.0, 0.0, 0.0));
-        bool? didAddNodeToAnchor =
-            await this.arObjectManager!.addNode(newNode, planeAnchor: newAnchor);
+        bool? didAddNodeToAnchor = await this
+            .arObjectManager!
+            .addNode(newNode, planeAnchor: newAnchor);
         if (didAddNodeToAnchor!) {
           this.nodes.add(newNode);
         } else {
@@ -180,10 +152,20 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         this.arSessionManager!.onError("Adding Anchor failed");
       }
     }
-      setState(() {
-        isLoading = false;
-      });
-      onEffectAR();
+
+    this.arSessionManager.onInitialize(
+          showFeaturePoints: false,
+          showPlanes: false,
+          customPlaneTexturePath: "triangle.png",
+          showWorldOrigin: false,
+          handleTaps: true,
+          handlePans: true,
+          handleRotation: true,
+        );
+    setState(() {
+      isLoading = false;
+    });
+    onEffectAR();
   }
 
   onPanStarted(String nodeName) {
@@ -224,27 +206,6 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     * (e.g. if you intend to share the nodes through the cloud)
     */
     //rotatedNode.transform = newTransform;
-  }
-
-  void showPlaneIndicator(){
-    if(this.planeIndicator == null){
-      this.planeIndicator = ARNode(
-        type: NodeType.webGLB,
-        uri:
-                "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-        scale: Vector3(0.2, 0.2, 0.2),
-        position: Vector3(0.0, 0.0, 0.0),
-        rotation: Vector4(1.0, 0.0, 0.0, 0.0));
-
-            bool? didAddNodeToAnchor =
-            await this.arObjectManager!.addNode(newNode, planeAnchor: newAnchor);
-    }
-    var newAnchor =
-          ARPlaneAnchor(transformation: singleHitTestResult.worldTransform);
-    
-    Size screenSize = MediaQuery.of(context).size;
-    double centerX = screenSize.width / 2;
-    double centerY = screenSize.height / 2;
   }
 
   void onEffectAR() {
@@ -314,47 +275,81 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                                 : Stack(children: <Widget>[
                                     ARView(
                                       onARViewCreated: onARViewCreated,
-                                      planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
+                                      planeDetectionConfig: PlaneDetectionConfig
+                                          .horizontalAndVertical,
                                     ),
                                     Container(
                                       alignment: Alignment.center,
-                                      child: isLoading
-                                          ? Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                  Padding(
+                                      child: !hasTapped
+                                          ? Container(
+                                              child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Container(
                                                       padding:
-                                                          const EdgeInsets.only(
-                                                              left: 20,
-                                                              right: 20),
-                                                      child:
-                                                          LinearProgressIndicator(
-                                                        backgroundColor:
-                                                            Colors.grey[300],
-                                                      )),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  const Text(
-                                                    'Đang tải mô hình 3D...',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  const Text(
-                                                    'Bạn nên hướng camera vào khu vực rộng để có trải nghiệm tốt nhất',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.normal),
-                                                  ),
-                                                ])
-                                          : Container(),
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.black45,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
+                                                      ),
+                                                      child: const Text(
+                                                        'Chạm vào vị trí bạn muốn đặt mô hình!',
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ),
+                                                  ]),
+                                            )
+                                          : (isLoading
+                                              ? Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                      Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  left: 20,
+                                                                  right: 20),
+                                                          child:
+                                                              LinearProgressIndicator(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .grey[300],
+                                                          )),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      const Text(
+                                                        'Đang tải mô hình 3D...',
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      const Text(
+                                                        'Bạn nên hướng camera vào khu vực rộng để có trải nghiệm tốt nhất',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal),
+                                                      ),
+                                                    ])
+                                              : Container()),
                                     ),
                                   ])),
                       ),

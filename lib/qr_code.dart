@@ -17,7 +17,7 @@ class QRScanScene extends StatefulWidget {
 class _QRScanSceneState extends State<QRScanScene> {
   Barcode? result;
   QRViewController? controller;
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'Quét mã');
 
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.

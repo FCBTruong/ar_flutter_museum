@@ -48,7 +48,7 @@ class _MyHomePage extends State<MyHomePage> {
         break;
       case 2:
         setState(() {
-          _currentScreen =  ObjectGesturesWidget();
+          _currentScreen =  const FavoriteScene();
           title = "Yêu thích";
         });
         break;
