@@ -10,6 +10,10 @@ import 'package:ar_flutter_plugin/datatypes/node_types.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:ar_flutter_plugin/datatypes/hittest_result_types.dart';
+import 'package:ar_flutter_plugin/models/ar_hittest_result.dart';
+import 'package:ar_flutter_plugin/models/ar_anchor.dart';
+import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'dart:developer';
 
 class LocalAndWebObjectsView extends StatefulWidget {
@@ -25,6 +29,10 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   late ARSessionManager arSessionManager;
   late ARObjectManager arObjectManager;
   late ARLocationManager arLocationManager;
+  ARAnchorManager? arAnchorManager;
+  List<ARNode> nodes = [];
+  List<ARAnchor> anchors = [];
+  late ARNode? planeIndicator;
 
 //String localObjectReference;
   ARNode? localObjectNode;
@@ -37,6 +45,12 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   dynamic modelAr;
   bool isLoading = false;
 
+   @override
+  void dispose() {
+    super.dispose();
+    arSessionManager!.dispose();
+  }
+
   void onARViewCreated(
       ARSessionManager arSessionManager,
       ARObjectManager arObjectManager,
@@ -46,18 +60,28 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     this.arSessionManager = arSessionManager;
     this.arObjectManager = arObjectManager;
     this.arLocationManager = arLocationManager;
+    this.arAnchorManager = arAnchorManager;
     // 2
     this.arSessionManager.onInitialize(
-          showFeaturePoints: false,
-          showPlanes: true,
+          showFeaturePoints: true,
+          showPlanes: false,
           customPlaneTexturePath: "triangle.png",
-          showWorldOrigin: true,
-          handleTaps: false,
+          showWorldOrigin: false,
+          handleTaps: true,
+          handlePans: true,
+          handleRotation: true,
         );
     // 3
-    this.arObjectManager.onInitialize();
+    this.arObjectManager!.onInitialize();
 
-    onWebObjectAtButtonPressed();
+    this.arSessionManager!.onPlaneOrPointTap = onPlaneOrPointTapped;
+    this.arObjectManager!.onPanStart = onPanStarted;
+    this.arObjectManager!.onPanChange = onPanChanged;
+    this.arObjectManager!.onPanEnd = onPanEnded;
+    this.arObjectManager!.onRotationStart = onRotationStarted;
+    this.arObjectManager!.onRotationChange = onRotationChanged;
+    this.arObjectManager!.onRotationEnd = onRotationEnded;
+   // onWebObjectAtButtonPressed();
   }
 
   Future<void> onLocalObjectButtonPressed() async {
@@ -111,6 +135,116 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       });
       onEffectAR();
     }
+  }
+
+   Future<void> onPlaneOrPointTapped(
+      List<ARHitTestResult> hitTestResults) async {
+        if(this.nodes.length == 1){
+          return;
+        }
+       modelAr = widget.artifact['modelAr'];
+       modelAsset = modelAr['modelAsset'];
+
+    if (modelAsset == null) {
+      log('modelAsset is null');
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    var singleHitTestResult = hitTestResults.firstWhere(
+        (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane);
+    if (singleHitTestResult != null) {
+      var newAnchor =
+          ARPlaneAnchor(transformation: singleHitTestResult.worldTransform);
+      bool? didAddAnchor = await this.arAnchorManager!.addAnchor(newAnchor);
+      if (didAddAnchor!) {
+        this.anchors.add(newAnchor);
+        // Add note to anchor
+        var newNode = ARNode(
+            type: NodeType.webGLB,
+            uri:
+                modelAsset['url'],
+            scale: Vector3(modelAr['scale']['x'].toDouble(), modelAr['scale']['y'].toDouble(),
+              modelAr['scale']['z'].toDouble()),
+            position: Vector3(0.0, 0.0, 0.0),
+            rotation: Vector4(1.0, 0.0, 0.0, 0.0));
+        bool? didAddNodeToAnchor =
+            await this.arObjectManager!.addNode(newNode, planeAnchor: newAnchor);
+        if (didAddNodeToAnchor!) {
+          this.nodes.add(newNode);
+        } else {
+          this.arSessionManager!.onError("Adding Node to Anchor failed");
+        }
+      } else {
+        this.arSessionManager!.onError("Adding Anchor failed");
+      }
+    }
+      setState(() {
+        isLoading = false;
+      });
+      onEffectAR();
+  }
+
+  onPanStarted(String nodeName) {
+    print("Started panning node " + nodeName);
+  }
+
+  onPanChanged(String nodeName) {
+    print("Continued panning node " + nodeName);
+  }
+
+  onPanEnded(String nodeName, Matrix4 newTransform) {
+    print("Ended panning node " + nodeName);
+    final pannedNode =
+        this.nodes.firstWhere((element) => element.name == nodeName);
+
+    /*
+    * Uncomment the following command if you want to keep the transformations of the Flutter representations of the nodes up to date
+    * (e.g. if you intend to share the nodes through the cloud)
+    */
+    //pannedNode.transform = newTransform;
+  }
+
+  onRotationStarted(String nodeName) {
+    print("Started rotating node " + nodeName);
+  }
+
+  onRotationChanged(String nodeName) {
+    print("Continued rotating node " + nodeName);
+  }
+
+  onRotationEnded(String nodeName, Matrix4 newTransform) {
+    print("Ended rotating node " + nodeName);
+    final rotatedNode =
+        this.nodes.firstWhere((element) => element.name == nodeName);
+
+    /*
+    * Uncomment the following command if you want to keep the transformations of the Flutter representations of the nodes up to date
+    * (e.g. if you intend to share the nodes through the cloud)
+    */
+    //rotatedNode.transform = newTransform;
+  }
+
+  void showPlaneIndicator(){
+    if(this.planeIndicator == null){
+      this.planeIndicator = ARNode(
+        type: NodeType.webGLB,
+        uri:
+                "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
+        scale: Vector3(0.2, 0.2, 0.2),
+        position: Vector3(0.0, 0.0, 0.0),
+        rotation: Vector4(1.0, 0.0, 0.0, 0.0));
+
+            bool? didAddNodeToAnchor =
+            await this.arObjectManager!.addNode(newNode, planeAnchor: newAnchor);
+    }
+    var newAnchor =
+          ARPlaneAnchor(transformation: singleHitTestResult.worldTransform);
+    
+    Size screenSize = MediaQuery.of(context).size;
+    double centerX = screenSize.width / 2;
+    double centerY = screenSize.height / 2;
   }
 
   void onEffectAR() {
@@ -180,6 +314,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                                 : Stack(children: <Widget>[
                                     ARView(
                                       onARViewCreated: onARViewCreated,
+                                      planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
                                     ),
                                     Container(
                                       alignment: Alignment.center,
