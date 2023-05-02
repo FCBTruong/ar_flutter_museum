@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:arcore_example/qr_code.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'favorite_scene.dart';
-import 'video_app.dart';
-import 'temp.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -28,7 +27,7 @@ class _MyHomePage extends State<MyHomePage> {
     super.initState();
   }
 
-  void onChangeTab(int tab, BuildContext context) {
+  void onChangeTab(int tab, BuildContext context) async {
     // ignore: avoid_print
     print('tab: ' + tab.toString());
     currentTab = tab;

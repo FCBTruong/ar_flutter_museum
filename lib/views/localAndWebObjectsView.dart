@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:typed_data';
+import 'dart:io';
+
 import 'package:arcore_example/views/artifact_detail_scene.dart';
 import 'package:flutter/material.dart';
 import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
@@ -16,6 +20,8 @@ import 'package:ar_flutter_plugin/models/ar_anchor.dart';
 import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 import 'dart:developer';
 import 'dart:ui';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:share_plus/share_plus.dart';
 
 class LocalAndWebObjectsView extends StatefulWidget {
   final dynamic artifact;
@@ -46,6 +52,11 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   dynamic modelAr;
   bool isLoading = false;
   bool hasTapped = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -108,7 +119,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
 
   Future<void> onPlaneOrPointTapped(
       List<ARHitTestResult> hitTestResults) async {
-    if (nodes.length == 1) {
+    if (nodes.isNotEmpty) {
       return;
     }
     modelAr = widget.artifact['modelAr'];
@@ -218,27 +229,88 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         context: context,
         builder: (_) => AlertDialog(
               insetPadding: const EdgeInsets.all(0),
-              content: FractionallySizedBox(
-                widthFactor: 1.0,
-                heightFactor: 1.0,
-                child: Container(
-                    decoration: BoxDecoration(
-                        image:
-                            DecorationImage(image: image, fit: BoxFit.cover))),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Icon(Icons.close),
+                  ),
+                ],
               ),
+              content: FractionallySizedBox(
+                  widthFactor: 1.0,
+                  heightFactor: 1,
+                  child: Container(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: image, fit: BoxFit.fitWidth)))),
               actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    // TODO: Add save logic here
+                IconButton(
+                  icon: const Icon(Icons.save),
+                  onPressed: () async {
+                    // assume "imgProvider" is the ImageProvider you want to save
+
+                    final Completer<ImageInfo> completer = Completer();
+                    image.resolve(const ImageConfiguration()).addListener(
+                          ImageStreamListener((ImageInfo info, bool _) =>
+                              completer.complete(info)),
+                        );
+
+                    log('done....');
+                    final ImageInfo info = await completer.future;
+
+                    final ByteData? bytes = await info.image.toByteData();
+                    final Uint8List imageData = bytes!.buffer.asUint8List();
+
+                    final result = await ImageGallerySaver.saveImage(imageData);
+
+                    if (result != null && result['isSuccess']) {
+                      // image successfully saved to photo gallery
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Đã lưu vào thư viện')));
+                    } else {
+                      // image save failed
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(const SnackBar(content: Text('Lỗi')));
+                    }
                   },
-                  child: const Text('Lưu'),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
+                IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: () async {
+                    // _onShare method:
+                    final box = context.findRenderObject() as RenderBox?;
+                    final Completer<ImageInfo> completer = Completer();
+                    image.resolve(const ImageConfiguration()).addListener(
+                          ImageStreamListener((ImageInfo info, bool _) =>
+                              completer.complete(info)),
+                        );
+
+                    log('done....');
+                    final ImageInfo info = await completer.future;
+
+                    final ByteData? bytes = await info.image.toByteData();
+                    final Uint8List imageData = bytes!.buffer.asUint8List();
+
+                    const String filePath = '/share_image.png';
+
+                    final File file = File(filePath);
+
+                    await file.writeAsBytes(imageData);
+
+                    await Share.shareFiles(
+                      [filePath],
+                      text: 'Share!',
+                      sharePositionOrigin:
+                          box!.localToGlobal(Offset.zero) & box.size,
+                    );
                   },
-                  child: const Text('Đóng'),
-                ),
+                )
               ],
             ));
   }
