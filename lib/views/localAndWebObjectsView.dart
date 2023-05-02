@@ -22,6 +22,7 @@ import 'dart:developer';
 import 'dart:ui';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 class LocalAndWebObjectsView extends StatefulWidget {
   final dynamic artifact;
@@ -254,18 +255,17 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                   icon: const Icon(Icons.save),
                   onPressed: () async {
                     // assume "imgProvider" is the ImageProvider you want to save
-
                     final Completer<ImageInfo> completer = Completer();
                     image.resolve(const ImageConfiguration()).addListener(
                           ImageStreamListener((ImageInfo info, bool _) =>
                               completer.complete(info)),
                         );
 
-                    log('done....');
                     final ImageInfo info = await completer.future;
 
-                    final ByteData? bytes = await info.image.toByteData();
-                    final Uint8List imageData = bytes!.buffer.asUint8List();
+                    final ByteData bytes =
+                        await info.image.toByteData() ?? ByteData(0);
+                    final Uint8List imageData = bytes.buffer.asUint8List();
 
                     final result = await ImageGallerySaver.saveImage(imageData);
 
@@ -294,10 +294,17 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                     log('done....');
                     final ImageInfo info = await completer.future;
 
-                    final ByteData? bytes = await info.image.toByteData();
-                    final Uint8List imageData = bytes!.buffer.asUint8List();
+                    final ByteData bytes =
+                        await info.image.toByteData() ?? ByteData(0);
+                    final Uint8List imageData = bytes.buffer.asUint8List();
 
-                    const String filePath = '/share_image.png';
+                    Directory appDocDir =
+                        await getApplicationDocumentsDirectory();
+                    String appDocPath = appDocDir.path;
+
+                    // Join the document directory path with the filename.
+                    var filename = 'share_image.png';
+                    String filePath = '$appDocPath/$filename';
 
                     final File file = File(filePath);
 
