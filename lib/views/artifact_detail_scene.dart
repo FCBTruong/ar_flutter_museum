@@ -69,10 +69,11 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     var info = artifact["information"];
 
     _isFavorite = ArtifactFavoriteMgr.isFavorite(artifactPackage['id']);
-    _isHasAR = artifact['modelAr'] != null && artifact['modelAr'] != "" &&
+    _isHasAR = artifact['modelAr'] != null &&
+        artifact['modelAr'] != "" &&
         artifact['modelAr']['modelAsset'] != null;
 
-    if(_isFavorite && !_isCachedData){
+    if (_isFavorite && !_isCachedData) {
       ArtifactFavoriteMgr.update(artifactPackage);
     }
 
@@ -92,21 +93,22 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
 
   Widget createWidgetByBlock(Map<String, dynamic> block) {
     Widget wg = Container();
-    Map<String, dynamic> blData = block['data'];
-    log('create widget by block');
 
+    log('create widget by block');
+    Map<String, dynamic> blData = block['data'];
     switch (block['type']) {
       case 'header':
         wg = Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10), child: Text(
-          blData['text'],
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-          ),
-        ));
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            child: Text(
+              blData['text'],
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 28,
+              ),
+            ));
         break;
       case 'paragraph':
         {
@@ -129,7 +131,8 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
                     child: const SizedBox(
                         width: double.infinity,
                         height: 200,
-                        child: Center(child: SizedBox(
+                        child: Center(
+                            child: SizedBox(
                           height: 30.0,
                           width: 30.0,
                           child: CircularProgressIndicator(
@@ -158,7 +161,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
           break;
         }
     }
-    return Expanded(child: wg);
+    return wg;
   }
 
   void onClickFavorite() {
@@ -206,9 +209,11 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
               child: ListView(
                   // This next line does the trick.
                   scrollDirection: Axis.vertical,
-                  children: information['blocks']
-                      .map<Widget>((block) => createWidgetByBlock(block))
-                      .toList())),
+                  children: information['blocks'] != null
+                      ? information['blocks']
+                          .map<Widget>((block) => createWidgetByBlock(block))
+                          .toList()
+                      : [])),
       floatingActionButton: Visibility(
           visible: !_isLoading && _isHasAR,
           child: FloatingActionButton(

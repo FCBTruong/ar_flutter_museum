@@ -52,7 +52,7 @@ class _MuseumScene extends State<MuseumScene> {
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 color: Colors.white24,
                 child: ListView(
-                    children: museums
+                    children: museums != null ? museums
                         .map<Widget>((museum) => MuseumCard(
                             title: museum['name'] ?? "Chưa cập nhật",
                             image: museum['imageUrl'] ??
@@ -62,7 +62,7 @@ class _MuseumScene extends State<MuseumScene> {
                                 museum['openingTime'] ?? "Chưa cập nhật",
                             onViewMorePressed: onViewMorePressed,
                             onContactPressed: onContactPressed))
-                        .toList()),
+                        .toList(): []),
               ));
   }
 }
