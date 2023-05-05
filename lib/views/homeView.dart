@@ -47,7 +47,7 @@ class _MyHomePage extends State<MyHomePage> {
         break;
       case 2:
         setState(() {
-          _currentScreen =  const FavoriteScene();
+          _currentScreen = const FavoriteScene();
           title = "Yêu thích";
         });
         break;
@@ -57,17 +57,15 @@ class _MyHomePage extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+        appBar: _currentScreen is FavoriteScene ? null : AppBar(
           title: Text(
             title,
           ),
         ),
-        body: Container(
-          child: PageStorage(
+        body: PageStorage(
             child: _currentScreen,
             bucket: _bucket,
           ),
-        ),
         bottomNavigationBar: createBottomAppBar(context));
   }
 

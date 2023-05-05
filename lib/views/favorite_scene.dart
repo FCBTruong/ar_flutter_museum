@@ -12,9 +12,30 @@ class FavoriteScene extends StatefulWidget {
 }
 
 class _FavoriteScene extends State<FavoriteScene> {
+  List<String> selectedMuseums = [];
+  List<dynamic> filteredArtifacts = [];
+  List<String> initMuseums = [];
   @override
   initState() {
     super.initState();
+    filteredArtifacts = ArtifactFavoriteMgr.listArtifacts;
+
+    List<dynamic> artifactPackages = [
+      ...ArtifactFavoriteMgr.listArtifacts
+    ]; // Replace with your actual list of artifacts
+    Set<String> museumNames = artifactPackages
+        .map((artifactPkg) => artifactPkg['museumName'].toString())
+        .toSet();
+    selectedMuseums = museumNames.toList();
+    initMuseums = museumNames.toList();
+
+    List<dynamic> artifactPkgList = [
+      ...ArtifactFavoriteMgr.listArtifacts
+    ]; // Replace with your actual list of artifacts
+    filteredArtifacts = artifactPkgList
+        .where((artifactPkg) =>
+            selectedMuseums.contains(artifactPkg['museumName']))
+        .toList();
   }
 
   void openArtifact(Map<String, dynamic> artifactPackage) {
@@ -28,75 +49,140 @@ class _FavoriteScene extends State<FavoriteScene> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(title: const Text("Yêu thích"), actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: PopupMenuButton(
+              itemBuilder: (context) => initMuseums
+                  .map<PopupMenuItem>(
+                    (museumName) => PopupMenuItem(
+                      child: Row(
+                        children: [
+                          Checkbox(
+                              value: selectedMuseums.contains(museumName),
+                              onChanged: (isChecked) => {
+                                    setState(() {
+                                      if (isChecked == true) {
+                                        selectedMuseums.add(museumName);
+                                      } else {
+                                        selectedMuseums.remove(museumName);
+                                      }
+                                      List<dynamic> artifactPkgList = [
+                                        ...ArtifactFavoriteMgr.listArtifacts
+                                      ]; // Replace with your actual list of artifacts
+                                      filteredArtifacts = artifactPkgList
+                                          .where((artifactPkg) =>
+                                              selectedMuseums.contains(
+                                                  artifactPkg['museumName']))
+                                          .toList();
+                                    })
+                                  }),
+                          Text(museumName)
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+              child: const Icon(Icons.filter_list),
+            ),
+          )
+        ]),
         body: Container(
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-      color: Colors.white12,
-      child: ArtifactFavoriteMgr.listArtifacts.isNotEmpty
-          ? ListView(
-              children: ArtifactFavoriteMgr.listArtifacts
-                  .map<Widget>((artifactPackage) => Card(
-                        clipBehavior: Clip.hardEdge,
-                        color: Color.fromARGB(255, 245, 245, 245),
-                        child: InkWell(
-                          splashColor:
-                              Color.fromARGB(255, 153, 153, 153).withAlpha(30),
-                          onTap: () {
-                            openArtifact(artifactPackage);
-                          },
-                          child: SizedBox(
-                              height: 200,
-                              child: Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: Column(children: [
-                                  Center(
-                                      child: Text(
-                                    artifactPackage['artifact']['name']
-                                        .toString(),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Colors.black),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          color: Colors.white12,
+          child: ArtifactFavoriteMgr.listArtifacts.isNotEmpty
+              ? ListView(
+                  children: filteredArtifacts
+                      .map<Widget>((artifactPackage) => Card(
+                            clipBehavior: Clip.hardEdge,
+                            color: Color.fromARGB(255, 245, 245, 245),
+                            child: InkWell(
+                              splashColor: Color.fromARGB(255, 153, 153, 153)
+                                  .withAlpha(30),
+                              onTap: () {
+                                openArtifact(artifactPackage);
+                              },
+                              child: SizedBox(
+                                  height: 200,
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                    child: Column(children: [
+                                      Center(
+                                          child: Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Text(
+                                                artifactPackage['artifact']
+                                                        ['name']
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ))),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: Image(
+                                              image: NetworkImage(artifactPackage[
+                                                              'artifact']
+                                                          ['image'] !=
+                                                      ""
+                                                  ? artifactPackage['artifact']
+                                                      ['image']
+                                                  : "https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg")),
+                                        ),
+                                        Expanded(
+                                            flex: 7,
+                                            child: SizedBox(
+                                                child: Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Text(
+                                                Utilities.subStr(
+                                                    artifactPackage['artifact']
+                                                            ['description']
+                                                        .toString(),
+                                                    100),
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 15,
+                                                    color: Colors.black),
+                                                overflow: TextOverflow.fade,
+                                              ),
+                                            )))
+                                      ]),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(children: [
+                                        const Icon(Icons.museum_outlined,
+                                            color: Colors.black),
+                                        Text(
+                                          Utilities.subStr(
+                                              artifactPackage
+                                                      .containsKey('museumName')
+                                                  ? artifactPackage[
+                                                          'museumName']
+                                                      .toString()
+                                                  : "",
+                                              100),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                              color: Colors.black),
+                                          overflow: TextOverflow.fade,
+                                        ),
+                                      ])
+                                    ]),
                                   )),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    Utilities.subStr(
-                                        artifactPackage['artifact']
-                                                ['description']
-                                            .toString(),
-                                        100),
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                    overflow: TextOverflow.fade,
-                                  ),
-                                  Text(
-                                    Utilities.subStr(
-                                        artifactPackage
-                                                .containsKey('museumName')
-                                            ? artifactPackage['museumName']
-                                                .toString()
-                                            : "",
-                                        100),
-                                    style: const TextStyle(
-                                        fontSize: 15, color: Colors.black),
-                                    overflow: TextOverflow.fade,
-                                  ),
-                                  Row(children: const [
-                                    Icon(Icons.museum_outlined,
-                                        color: Colors.black),
-                                    Text(
-                                      'British Museum',
-                                      style: TextStyle(
-                                          fontSize: 15, color: Colors.black),
-                                    )
-                                  ])
-                                ]),
-                              )),
-                        ),
-                      ))
-                  .toList())
-          : const Center(child: Text('Chưa có mục yêu thích nào')),
-    ));
+                            ),
+                          ))
+                      .toList())
+              : const Center(child: Text('Chưa có mục yêu thích nào')),
+        ));
   }
 }
