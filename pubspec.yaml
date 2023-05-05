@@ -26,6 +26,7 @@ dependencies:
   model_viewer_plus: ^1.5.0
   image_gallery_saver: ^1.7.1
   share_plus: ^6.3.4
+  youtube_player_flutter: ^8.1.2
 
 dev_dependencies:
   flutter_test:

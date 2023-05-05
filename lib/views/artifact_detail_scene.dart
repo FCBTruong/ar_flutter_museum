@@ -4,11 +4,11 @@ import 'package:arcore_example/views/video_app.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:developer';
-import 'package:arcore_example/logic/text_handler.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:arcore_example/logic/artifact_favorite_mgr.dart';
 import 'package:appinio_video_player/appinio_video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class ArtifactDetailScene extends StatefulWidget {
   final String url;
@@ -151,6 +151,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
       case 'video':
         {
           String url = blData['file']['url'];
+
           wg = VideoApp(url: url);
           break;
         }
@@ -159,6 +160,28 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
           String url = blData['url'];
           wg = AudioPlayerBlock(audioUrl: url);
           break;
+        }
+      case 'embed':
+        {
+          var service = blData['service'];
+
+          if (service == 'youtube') {
+            var videoId = YoutubePlayer.convertUrlToId(blData['source']);
+            YoutubePlayerController _controller = YoutubePlayerController(
+              initialVideoId: videoId!,
+              flags: const YoutubePlayerFlags(
+                autoPlay: true,
+                mute: true,
+              ),
+            );
+
+            wg = Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: YoutubePlayer(
+                  controller: _controller,
+                  showVideoProgressIndicator: true,
+                ));
+          }
         }
     }
     return wg;
@@ -204,7 +227,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
       body: (_isLoading)
           ? const Center(child: CircularProgressIndicator())
           : Container(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
               color: Colors.white12,
               child: ListView(
                   // This next line does the trick.
