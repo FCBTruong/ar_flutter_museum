@@ -60,7 +60,7 @@ class _FavoriteScene extends State<FavoriteScene> {
                         children: [
                           Checkbox(
                               value: selectedMuseums.contains(museumName),
-                              onChanged: (isChecked) => {
+                              onChanged: (isChecked) => 
                                     setState(() {
                                       if (isChecked == true) {
                                         selectedMuseums.add(museumName);
@@ -76,7 +76,7 @@ class _FavoriteScene extends State<FavoriteScene> {
                                                   artifactPkg['museumName']))
                                           .toList();
                                     })
-                                  }),
+                                  ),
                           Text(museumName)
                         ],
                       ),
