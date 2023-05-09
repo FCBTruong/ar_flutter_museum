@@ -15,6 +15,8 @@ class _FavoriteScene extends State<FavoriteScene> {
   List<String> selectedMuseums = [];
   List<dynamic> filteredArtifacts = [];
   List<String> initMuseums = [];
+ PopupMenuButton<dynamic>? _popupMenuButton;
+
   @override
   initState() {
     super.initState();
@@ -29,13 +31,7 @@ class _FavoriteScene extends State<FavoriteScene> {
     selectedMuseums = museumNames.toList();
     initMuseums = museumNames.toList();
 
-    List<dynamic> artifactPkgList = [
-      ...ArtifactFavoriteMgr.listArtifacts
-    ]; // Replace with your actual list of artifacts
-    filteredArtifacts = artifactPkgList
-        .where((artifactPkg) =>
-            selectedMuseums.contains(artifactPkg['museumName']))
-        .toList();
+    filteredArtifacts = filterArtifactsByMuseums(selectedMuseums);
   }
 
   void openArtifact(Map<String, dynamic> artifactPackage) {
@@ -46,46 +42,56 @@ class _FavoriteScene extends State<FavoriteScene> {
                 url: "", artifactPackage: artifactPackage)));
   }
 
+  void _onMuseumSelected(String museumName, bool isChecked) {
+    setState(() {
+      if (isChecked == true) {
+        selectedMuseums.add(museumName);
+      } else {
+        selectedMuseums.remove(museumName);
+      }
+      filteredArtifacts = filterArtifactsByMuseums(selectedMuseums);
+    });
+  }
+
+  List<dynamic> filterArtifactsByMuseums(List<String> selectedMuseums) {
+    List<dynamic> artifactPkgList = [
+      ...ArtifactFavoriteMgr.listArtifacts
+    ]; // Replace with your actual list of artifacts
+
+    return artifactPkgList
+        .where((artifactPkg) =>
+            selectedMuseums.contains(artifactPkg['museumName']))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
+    _popupMenuButton = PopupMenuButton(
+                itemBuilder: (context) => initMuseums
+                    .map<PopupMenuItem>(
+                      (museumName) => PopupMenuItem(
+                        child: CheckboxListTile(
+                          title: Text(museumName),
+                          value: selectedMuseums.contains(museumName),
+                          onChanged: (value) {
+                            _onMuseumSelected(
+                              museumName,
+                              value!,
+                            );
+                          },
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                      ),
+                    )
+                    .toList(),
+                child: const Icon(Icons.filter_list),
+              );
+
     return Scaffold(
         appBar: AppBar(title: const Text("Yêu thích"), actions: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: PopupMenuButton(
-              itemBuilder: (context) => initMuseums
-                  .map<PopupMenuItem>(
-                    (museumName) => PopupMenuItem(
-                      child: Row(
-                        children: [
-                          Checkbox(
-                              value: selectedMuseums.contains(museumName),
-                              onChanged: (isChecked) => 
-                                    setState(() {
-                                      if (isChecked == true) {
-                                        selectedMuseums.add(museumName);
-                                      } else {
-                                        selectedMuseums.remove(museumName);
-                                      }
-                                      List<dynamic> artifactPkgList = [
-                                        ...ArtifactFavoriteMgr.listArtifacts
-                                      ]; // Replace with your actual list of artifacts
-                                      filteredArtifacts = artifactPkgList
-                                          .where((artifactPkg) =>
-                                              selectedMuseums.contains(
-                                                  artifactPkg['museumName']))
-                                          .toList();
-                                    })
-                                  ),
-                          Text(museumName)
-                        ],
-                      ),
-                    ),
-                  )
-                  .toList(),
-              child: const Icon(Icons.filter_list),
-            ),
-          )
+              padding: const EdgeInsets.only(right: 10),
+              child: _popupMenuButton)
         ]),
         body: Container(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),

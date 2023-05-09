@@ -53,6 +53,8 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   dynamic modelAr;
   bool isLoading = false;
   bool hasTapped = false;
+  double _sliderValue = 1.0;
+  double _defaultScale = 1;
 
   @override
   void initState() {
@@ -133,6 +135,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     setState(() {
       hasTapped = true;
       isLoading = true;
+      _defaultScale = modelAr['scale']['x'].toDouble();
     });
     var singleHitTestResult = hitTestResults.firstWhere(
         (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane);
@@ -146,10 +149,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         var newNode = ARNode(
             type: NodeType.webGLB,
             uri: modelAsset['url'],
-            scale: Vector3(
-                modelAr['scale']['x'].toDouble(),
-                modelAr['scale']['y'].toDouble(),
-                modelAr['scale']['z'].toDouble()),
+            scale: Vector3(_defaultScale, _defaultScale, _defaultScale),
             position: Vector3(0.0, 0.0, 0.0),
             rotation: Vector4(1.0, 0.0, 0.0, 0.0));
         bool? didAddNodeToAnchor = await this
@@ -218,6 +218,18 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     * (e.g. if you intend to share the nodes through the cloud)
     */
     //rotatedNode.transform = newTransform;
+  }
+
+  onChangeSliderValue(double zoomScale) {
+    if (nodes.isNotEmpty) {
+      var curNode = nodes[0];
+      double newScale = 0;
+      newScale = _defaultScale * zoomScale;
+      curNode.scale = Vector3(newScale, newScale, newScale);
+    }
+    setState(() {
+      _sliderValue = zoomScale;
+    });
   }
 
   void onEffectAR() {
@@ -459,6 +471,37 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                 ),
               )),
         ),
+        Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.add,
+                    color: Colors.black87,
+                  ),
+                  RotatedBox(
+                    quarterTurns: -1,
+                    child: Slider(
+                      value: _sliderValue,
+                      min: 0.2,
+                      max: 5,
+                      onChanged: (newValue) {
+                        onChangeSliderValue(newValue);
+                      },
+                    ),
+                  ),
+                  const Icon(
+                    Icons.remove,
+                    color: Colors.black87,
+                  ),
+                ],
+              )
+            ],
+          ),
+        )
       ]),
     );
   }
