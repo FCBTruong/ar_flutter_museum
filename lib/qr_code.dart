@@ -78,12 +78,13 @@ class _QRScanSceneState extends State<QRScanScene> {
         log('url qrcode: ' + url);
 
         controller.dispose();
-        Navigator.push(
-            context,
+
+        Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-                builder: (context) => ArtifactDetailScene(
+                builder: (BuildContext context) => ArtifactDetailScene(
                       url: url,
-                    )));
+                    )),
+            (Route<dynamic> route) => false);
       });
     });
   }

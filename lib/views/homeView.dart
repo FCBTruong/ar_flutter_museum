@@ -17,7 +17,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePage extends State<MyHomePage> {
-  String title = "AR";
+  String title = "Quét mã";
   int currentTab = 2;
   Widget _currentScreen = const QRScanScene();
   final PageStorageBucket _bucket = PageStorageBucket();

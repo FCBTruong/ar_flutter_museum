@@ -1,4 +1,6 @@
+import 'package:arcore_example/qr_code.dart';
 import 'package:arcore_example/views/audio_player.dart';
+import 'package:arcore_example/views/homeView.dart';
 import 'package:arcore_example/views/localAndWebObjectsView.dart';
 import 'package:arcore_example/views/video_app.dart';
 import 'package:flutter/material.dart';
@@ -199,7 +201,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
         {
           var items = blData['items'];
           var style = blData['style'];
-      
+
           int count = 1;
           if (items != null) {
             wg = Padding(
@@ -208,7 +210,9 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
                     children: items
                         .map<Widget>((block) => Row(
                               children: [
-                                Text(style == "unordered" ? '• ' : (count ++).toString() + '. '),
+                                Text(style == "unordered"
+                                    ? '• '
+                                    : (count++).toString() + '. '),
                                 Text(block.toString())
                               ],
                             ))
@@ -235,64 +239,76 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: Text(_appBarTitle),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          actions: <Widget>[
-            Visibility(
-                visible: !_isLoading && _isHasAR,
-                child: Row(children: [
-                  const Text(
-                    'Trải nghiệm AR',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      openARView();
-                    },
-                    icon: const Icon(Icons.view_in_ar),
-                  )
-                ])),
-            IconButton(
-              icon: Icon((_isFavorite)
-                  ? Icons.favorite
-                  : Icons.favorite_border_outlined),
-              tooltip: 'Thêm vào danh sách yêu thích',
-              onPressed: () {
-                onClickFavorite();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text((_isFavorite)
-                        ? 'Đã thêm vào danh sách yêu thích'
-                        : "Đã xóa khỏi danh sách yêu thích")));
-              },
-            ),
-          ]),
-      body: (_isLoading)
-          ? const Center(child: CircularProgressIndicator())
-          : Container(
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              color: Colors.white12,
-              child: ListView(
-                  // This next line does the trick.
-                  scrollDirection: Axis.vertical,
-                  children: information['blocks'] != null
-                      ? information['blocks']
-                          .map<Widget>((block) => createWidgetByBlock(block))
-                          .toList()
-                      : [])),
-      // floatingActionButton: Visibility(
-      //     visible: !_isLoading && _isHasAR,
-      //     child: FloatingActionButton(
-      //       onPressed: () {
-      //         openARView();
-      //       },
-      //       backgroundColor: Colors.green,
-      //       child: const Icon(Icons.view_in_ar),
-      //     )),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          !_isCachedData
+              ? Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const MyHomePage()))
+              : Navigator.of(context).pop();
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+              title: Text(_appBarTitle),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => !_isCachedData
+                    ? Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const MyHomePage()))
+                    : Navigator.of(context).pop(),
+              ),
+              actions: <Widget>[
+                Visibility(
+                    visible: !_isLoading && _isHasAR,
+                    child: Row(children: [
+                      const Text(
+                        'Trải nghiệm AR',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          openARView();
+                        },
+                        icon: const Icon(Icons.view_in_ar),
+                      )
+                    ])),
+                IconButton(
+                  icon: Icon((_isFavorite)
+                      ? Icons.favorite
+                      : Icons.favorite_border_outlined),
+                  tooltip: 'Thêm vào danh sách yêu thích',
+                  onPressed: () {
+                    onClickFavorite();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text((_isFavorite)
+                            ? 'Đã thêm vào danh sách yêu thích'
+                            : "Đã xóa khỏi danh sách yêu thích")));
+                  },
+                ),
+              ]),
+          body: (_isLoading)
+              ? const Center(child: CircularProgressIndicator())
+              : Container(
+                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                  color: Colors.white12,
+                  child: ListView(
+                      // This next line does the trick.
+                      scrollDirection: Axis.vertical,
+                      children: information['blocks'] != null
+                          ? information['blocks']
+                              .map<Widget>(
+                                  (block) => createWidgetByBlock(block))
+                              .toList()
+                          : [])),
+          // floatingActionButton: Visibility(
+          //     visible: !_isLoading && _isHasAR,
+          //     child: FloatingActionButton(
+          //       onPressed: () {
+          //         openARView();
+          //       },
+          //       backgroundColor: Colors.green,
+          //       child: const Icon(Icons.view_in_ar),
+          //     )),
+        ));
   }
 }
