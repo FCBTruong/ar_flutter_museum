@@ -108,11 +108,9 @@ class _FavoriteScene extends State<FavoriteScene> {
                               onTap: () {
                                 openArtifact(artifactPackage);
                               },
-                              child: SizedBox(
-                                  height: 200,
-                                  child: Padding(
+                              child: Padding(
                                     padding:
-                                        const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                        const EdgeInsets.fromLTRB(5, 5, 5, 5),
                                     child: Column(children: [
                                       Center(
                                           child: Padding(
@@ -184,7 +182,7 @@ class _FavoriteScene extends State<FavoriteScene> {
                                         ),
                                       ])
                                     ]),
-                                  )),
+                                  ),
                             ),
                           ))
                       .toList())

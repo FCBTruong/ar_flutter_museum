@@ -53,7 +53,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
   dynamic modelAr;
   bool isLoading = false;
   bool hasTapped = false;
-  double _sliderValue = 1.0;
+  double _sliderValue = 50.0;
   double _defaultScale = 1;
 
   @override
@@ -80,7 +80,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     // 2
     this.arSessionManager.onInitialize(
           showFeaturePoints: true,
-          showPlanes: false,
+          showPlanes: true,
           customPlaneTexturePath: "triangle.png",
           showWorldOrigin: false,
           handleTaps: true,
@@ -137,6 +137,11 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       isLoading = true;
       _defaultScale = modelAr['scale']['x'].toDouble();
     });
+    if(hitTestResults.isEmpty){
+        ScaffoldMessenger.of(context)
+                          .showSnackBar(const SnackBar(content: Text('Đặt mô hình lên mặt phẳng')));
+       return;
+    }
     var singleHitTestResult = hitTestResults.firstWhere(
         (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane);
     if (singleHitTestResult != null) {
@@ -220,15 +225,16 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     //rotatedNode.transform = newTransform;
   }
 
-  onChangeSliderValue(double zoomScale) {
-    if (nodes.isNotEmpty) {
-      var curNode = nodes[0];
-      double newScale = 0;
-      newScale = _defaultScale * zoomScale;
-      curNode.scale = Vector3(newScale, newScale, newScale);
-    }
+  onChangeSliderValue(double newValue) {
     setState(() {
-      _sliderValue = zoomScale;
+      _sliderValue = newValue;
+      if (nodes.isNotEmpty) {
+        var curNode = nodes[0];
+        double newScale = 0;
+        var zoomScale = (newValue >= 50) ?  (newValue - 50) / 50 * 4 + 1 : 1 - (50 - newValue) / 50 * 4 / 5;
+        newScale = _defaultScale * (zoomScale);
+        curNode.scale = Vector3(newScale, newScale, newScale);
+      }
     });
   }
 
@@ -367,38 +373,36 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                                     ARView(
                                       onARViewCreated: onARViewCreated,
                                       planeDetectionConfig: PlaneDetectionConfig
-                                          .horizontalAndVertical,
+                                          .horizontal,
                                     ),
                                     Container(
                                       alignment: Alignment.center,
                                       child: !hasTapped
-                                          ? Container(
-                                              child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.black45,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
-                                                      ),
-                                                      child: const Text(
-                                                        'Chạm vào vị trí bạn muốn đặt mô hình!',
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                  ]),
-                                            )
+                                          ? Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(
+                                                          8.0),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black45,
+                                                    borderRadius:
+                                                        BorderRadius
+                                                            .circular(8.0),
+                                                  ),
+                                                  child: const Text(
+                                                    'Chạm vào vị trí bạn muốn đặt mô hình!',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight
+                                                                .bold),
+                                                  ),
+                                                ),
+                                              ])
                                           : (isLoading
                                               ? Column(
                                                   mainAxisAlignment:
@@ -483,16 +487,29 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                     color: Colors.black87,
                   ),
                   RotatedBox(
-                    quarterTurns: -1,
-                    child: Slider(
-                      value: _sliderValue,
-                      min: 0.2,
-                      max: 5,
-                      onChanged: (newValue) {
-                        onChangeSliderValue(newValue);
-                      },
-                    ),
-                  ),
+                      quarterTurns: -1,
+                      child: SliderTheme(
+                        data: SliderThemeData(
+                          thumbColor: Colors.blue,
+                          activeTrackColor: Colors.blue,
+                          inactiveTrackColor: Colors.grey,
+                          overlayColor: Colors.blue.withOpacity(0.3),
+                          thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 10.0),
+                          overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 20.0),
+                          trackHeight: 2.0,
+                          tickMarkShape: const RoundSliderTickMarkShape(),
+                        ),
+                        child: Slider(
+                          value: _sliderValue,
+                          min: 0,
+                          max: 100,
+                          onChanged: (newValue) {
+                            onChangeSliderValue(newValue);
+                          },
+                        ),
+                      )),
                   const Icon(
                     Icons.remove,
                     color: Colors.black87,

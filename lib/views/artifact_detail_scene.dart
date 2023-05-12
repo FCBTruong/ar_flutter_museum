@@ -119,11 +119,22 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
       case 'image':
         {
           wg = Padding(
-            padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+            padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
             child: Image.network(blData['file']['url'],
                 loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) {
-                return child;
+                return Column(
+                    children: ([
+                  child,
+                  Visibility(
+                      visible:
+                          blData['caption'] != '' && blData['caption'] != null,
+                      child: Text(
+                        blData['caption'],
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontStyle: FontStyle.italic),
+                      ))
+                ]));
               }
               return Center(
                 child: DecoratedBox(
@@ -182,6 +193,28 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
                   showVideoProgressIndicator: true,
                 ));
           }
+          break;
+        }
+      case 'list':
+        {
+          var items = blData['items'];
+          var style = blData['style'];
+      
+          int count = 1;
+          if (items != null) {
+            wg = Padding(
+                padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+                child: Column(
+                    children: items
+                        .map<Widget>((block) => Row(
+                              children: [
+                                Text(style == "unordered" ? '• ' : (count ++).toString() + '. '),
+                                Text(block.toString())
+                              ],
+                            ))
+                        .toList()));
+          }
+          break;
         }
     }
     return wg;
@@ -210,6 +243,20 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           actions: <Widget>[
+            Visibility(
+                visible: !_isLoading && _isHasAR,
+                child: Row(children: [
+                  const Text(
+                    'Trải nghiệm AR',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      openARView();
+                    },
+                    icon: const Icon(Icons.view_in_ar),
+                  )
+                ])),
             IconButton(
               icon: Icon((_isFavorite)
                   ? Icons.favorite
@@ -237,15 +284,15 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
                           .map<Widget>((block) => createWidgetByBlock(block))
                           .toList()
                       : [])),
-      floatingActionButton: Visibility(
-          visible: !_isLoading && _isHasAR,
-          child: FloatingActionButton(
-            onPressed: () {
-              openARView();
-            },
-            backgroundColor: Colors.green,
-            child: const Icon(Icons.view_in_ar),
-          )),
+      // floatingActionButton: Visibility(
+      //     visible: !_isLoading && _isHasAR,
+      //     child: FloatingActionButton(
+      //       onPressed: () {
+      //         openARView();
+      //       },
+      //       backgroundColor: Colors.green,
+      //       child: const Icon(Icons.view_in_ar),
+      //     )),
     );
   }
 }

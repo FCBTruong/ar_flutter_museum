@@ -74,9 +74,9 @@ class _MyHomePage extends State<MyHomePage> {
         child: ConvexAppBar(
       initialActiveIndex: 1,
       items: const [
-        TabItem(icon: Icons.museum, title: 'Museum'),
-        TabItem(icon: Icons.qr_code_scanner_rounded, title: 'Scan'),
-        TabItem(icon: Icons.favorite, title: 'Favorite'),
+        TabItem(icon: Icons.museum, title: 'Bảo tàng'),
+        TabItem(icon: Icons.qr_code_scanner_rounded, title: 'Quét'),
+        TabItem(icon: Icons.favorite, title: 'Yêu thích'),
       ],
       onTap: (int i) => {onChangeTab(i, context)},
     ));
