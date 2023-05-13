@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:io';
+import 'package:dio/dio.dart';
 
 import 'package:arcore_example/views/artifact_detail_scene.dart';
 import 'package:flutter/material.dart';
@@ -47,18 +48,32 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
 
 //String webObjectReference;
   ARNode? webObjectNode;
-  bool isTest = false;
+  bool isTest = true;
   bool isViewingDetail = false;
   dynamic modelAsset;
   dynamic modelAr;
-  bool isLoading = false;
+  bool isDownloaded = false;
   bool hasTapped = false;
   double _sliderValue = 50.0;
   double _defaultScale = 1;
+  String localModelPath = "";
 
   @override
   void initState() {
     super.initState();
+
+    modelAr = widget.artifact['modelAr'];
+    modelAsset = modelAr['modelAsset'];
+
+
+    downloadModel();
+  }
+
+  void downloadModel() async {
+    localModelPath = await _downloadAndSaveFile(modelAsset['url']);
+    setState(() {
+      isDownloaded = true;
+    });
   }
 
   @override
@@ -100,6 +115,20 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     // onWebObjectAtButtonPressed();
   }
 
+  Future<String> _downloadAndSaveFile(String fileUrl) async {
+    String fileName = fileUrl.split('/').last;
+    String savedDir = (await getApplicationDocumentsDirectory()).path;
+    String localPath = '$savedDir/$fileName';
+    bool fileExists = await File(localPath).exists();
+
+    if (!fileExists) {
+      Dio dio = Dio();
+      await dio.download(fileUrl, localPath);
+    }
+
+    return localPath;
+  }
+
   Future<void> onLocalObjectButtonPressed() async {
     // 1
     if (localObjectNode != null) {
@@ -125,8 +154,6 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     if (nodes.isNotEmpty) {
       return;
     }
-    modelAr = widget.artifact['modelAr'];
-    modelAsset = modelAr['modelAsset'];
 
     if (modelAsset == null) {
       log('modelAsset is null');
@@ -134,13 +161,12 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     }
     setState(() {
       hasTapped = true;
-      isLoading = true;
       _defaultScale = modelAr['scale']['x'].toDouble();
     });
-    if(hitTestResults.isEmpty){
-        ScaffoldMessenger.of(context)
-                          .showSnackBar(const SnackBar(content: Text('Đặt mô hình lên mặt phẳng')));
-       return;
+    if (hitTestResults.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đặt mô hình lên mặt phẳng')));
+      return;
     }
     var singleHitTestResult = hitTestResults.firstWhere(
         (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane);
@@ -153,7 +179,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         // Add note to anchor
         var newNode = ARNode(
             type: NodeType.webGLB,
-            uri: modelAsset['url'],
+            uri: localModelPath,
             scale: Vector3(_defaultScale, _defaultScale, _defaultScale),
             position: Vector3(0.0, 0.0, 0.0),
             rotation: Vector4(1.0, 0.0, 0.0, 0.0));
@@ -179,9 +205,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
           handlePans: true,
           handleRotation: true,
         );
-    setState(() {
-      isLoading = false;
-    });
+
     onEffectAR();
   }
 
@@ -231,7 +255,9 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       if (nodes.isNotEmpty) {
         var curNode = nodes[0];
         double newScale = 0;
-        var zoomScale = (newValue >= 50) ?  (newValue - 50) / 50 * 4 + 1 : 1 - (50 - newValue) / 50 * 4 / 5;
+        var zoomScale = (newValue >= 50)
+            ? (newValue - 50) / 50 * 4 + 1
+            : 1 - (50 - newValue) / 50 * 4 / 5;
         newScale = _defaultScale * (zoomScale);
         curNode.scale = Vector3(newScale, newScale, newScale);
       }
@@ -368,42 +394,44 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                         child: Container(
                             color: Colors.black,
                             child: isTest
-                                ? Container()
+                                ? Text(
+                                    localModelPath,
+                                    style: const TextStyle(color: Colors.white),
+                                  )
                                 : Stack(children: <Widget>[
                                     ARView(
                                       onARViewCreated: onARViewCreated,
-                                      planeDetectionConfig: PlaneDetectionConfig
-                                          .horizontal,
+                                      planeDetectionConfig:
+                                          PlaneDetectionConfig.horizontal,
                                     ),
                                     Container(
                                       alignment: Alignment.center,
-                                      child: !hasTapped
+                                      child: !hasTapped && isDownloaded
                                           ? Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.all(
-                                                          8.0),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.black45,
-                                                    borderRadius:
-                                                        BorderRadius
-                                                            .circular(8.0),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.black45,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8.0),
+                                                    ),
+                                                    child: const Text(
+                                                      'Chạm vào vị trí bạn muốn đặt mô hình!',
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
                                                   ),
-                                                  child: const Text(
-                                                    'Chạm vào vị trí bạn muốn đặt mô hình!',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight
-                                                                .bold),
-                                                  ),
-                                                ),
-                                              ])
-                                          : (isLoading
+                                                ])
+                                          : (!isDownloaded
                                               ? Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
@@ -475,50 +503,52 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
                 ),
               )),
         ),
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.add,
-                    color: Colors.black87,
-                  ),
-                  RotatedBox(
-                      quarterTurns: -1,
-                      child: SliderTheme(
-                        data: SliderThemeData(
-                          thumbColor: Colors.blue,
-                          activeTrackColor: Colors.blue,
-                          inactiveTrackColor: Colors.grey,
-                          overlayColor: Colors.blue.withOpacity(0.3),
-                          thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 10.0),
-                          overlayShape: const RoundSliderOverlayShape(
-                              overlayRadius: 20.0),
-                          trackHeight: 2.0,
-                          tickMarkShape: const RoundSliderTickMarkShape(),
+        isDownloaded && hasTapped
+            ? Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.add,
+                          color: Colors.black87,
                         ),
-                        child: Slider(
-                          value: _sliderValue,
-                          min: 0,
-                          max: 100,
-                          onChanged: (newValue) {
-                            onChangeSliderValue(newValue);
-                          },
+                        RotatedBox(
+                            quarterTurns: -1,
+                            child: SliderTheme(
+                              data: SliderThemeData(
+                                thumbColor: Colors.blue,
+                                activeTrackColor: Colors.blue,
+                                inactiveTrackColor: Colors.grey,
+                                overlayColor: Colors.blue.withOpacity(0.3),
+                                thumbShape: const RoundSliderThumbShape(
+                                    enabledThumbRadius: 10.0),
+                                overlayShape: const RoundSliderOverlayShape(
+                                    overlayRadius: 20.0),
+                                trackHeight: 2.0,
+                                tickMarkShape: const RoundSliderTickMarkShape(),
+                              ),
+                              child: Slider(
+                                value: _sliderValue,
+                                min: 0,
+                                max: 100,
+                                onChanged: (newValue) {
+                                  onChangeSliderValue(newValue);
+                                },
+                              ),
+                            )),
+                        const Icon(
+                          Icons.remove,
+                          color: Colors.black87,
                         ),
-                      )),
-                  const Icon(
-                    Icons.remove,
-                    color: Colors.black87,
-                  ),
-                ],
+                      ],
+                    )
+                  ],
+                ),
               )
-            ],
-          ),
-        )
+            : Container()
       ]),
     );
   }

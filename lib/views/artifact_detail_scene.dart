@@ -165,7 +165,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
         {
           String url = blData['file']['url'];
 
-          wg = VideoApp(url: url);
+          wg =  VideoApp(url: url);
           break;
         }
       case 'audio':
