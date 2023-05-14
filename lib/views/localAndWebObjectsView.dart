@@ -48,7 +48,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
 
 //String webObjectReference;
   ARNode? webObjectNode;
-  bool isTest = true;
+  bool isTest = false;
   bool isViewingDetail = false;
   dynamic modelAsset;
   dynamic modelAr;
@@ -65,12 +65,12 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
     modelAr = widget.artifact['modelAr'];
     modelAsset = modelAr['modelAsset'];
 
-
     downloadModel();
   }
 
   void downloadModel() async {
     localModelPath = await _downloadAndSaveFile(modelAsset['url']);
+    localModelPath = localModelPath.split('/').last;
     setState(() {
       isDownloaded = true;
     });
@@ -178,7 +178,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
         this.anchors.add(newAnchor);
         // Add note to anchor
         var newNode = ARNode(
-            type: NodeType.webGLB,
+            type: NodeType.fileSystemAppFolderGLTF2,
             uri: localModelPath,
             scale: Vector3(_defaultScale, _defaultScale, _defaultScale),
             position: Vector3(0.0, 0.0, 0.0),
