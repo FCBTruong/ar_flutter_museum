@@ -159,41 +159,50 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
       log('modelAsset is null');
       return;
     }
-    setState(() {
-      hasTapped = true;
-      _defaultScale = modelAr['scale']['x'].toDouble();
-    });
+
     if (hitTestResults.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đặt mô hình lên mặt phẳng')));
       return;
     }
+
+    bool hasPlane = false;
+    for (var element in hitTestResults) {
+      if (element.type == ARHitTestResultType.plane) {
+        hasPlane = true;
+        break;
+      }
+    }
+
+    if (!hasPlane) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Hướng camera tới mặt phẳng')));
+      return;
+    }
+
     var singleHitTestResult = hitTestResults.firstWhere(
         (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane);
-    if (singleHitTestResult != null) {
-      var newAnchor =
-          ARPlaneAnchor(transformation: singleHitTestResult.worldTransform);
-      bool? didAddAnchor = await this.arAnchorManager!.addAnchor(newAnchor);
-      if (didAddAnchor!) {
-        this.anchors.add(newAnchor);
-        // Add note to anchor
-        var newNode = ARNode(
-            type: NodeType.fileSystemAppFolderGLTF2,
-            uri: localModelPath,
-            scale: Vector3(_defaultScale, _defaultScale, _defaultScale),
-            position: Vector3(0.0, 0.0, 0.0),
-            rotation: Vector4(1.0, 0.0, 0.0, 0.0));
-        bool? didAddNodeToAnchor = await this
-            .arObjectManager!
-            .addNode(newNode, planeAnchor: newAnchor);
-        if (didAddNodeToAnchor!) {
-          this.nodes.add(newNode);
-        } else {
-          this.arSessionManager!.onError("Adding Node to Anchor failed");
-        }
+    var newAnchor =
+        ARPlaneAnchor(transformation: singleHitTestResult.worldTransform);
+    bool? didAddAnchor = await arAnchorManager!.addAnchor(newAnchor);
+    if (didAddAnchor!) {
+      anchors.add(newAnchor);
+      // Add note to anchor
+      var newNode = ARNode(
+          type: NodeType.fileSystemAppFolderGLB,
+          uri: localModelPath,
+          scale: Vector3(_defaultScale, _defaultScale, _defaultScale),
+          position: Vector3(0.0, 0.0, 0.0),
+          rotation: Vector4(1.0, 0.0, 0.0, 0.0));
+      bool? didAddNodeToAnchor =
+          await arObjectManager!.addNode(newNode, planeAnchor: newAnchor);
+      if (didAddNodeToAnchor!) {
+        nodes.add(newNode);
       } else {
-        this.arSessionManager!.onError("Adding Anchor failed");
+        arSessionManager!.onError("Adding Node to Anchor failed");
       }
+    } else {
+      arSessionManager!.onError("Adding Anchor failed");
     }
 
     this.arSessionManager.onInitialize(
@@ -205,6 +214,11 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
           handlePans: true,
           handleRotation: true,
         );
+
+    setState(() {
+      hasTapped = true;
+      _defaultScale = modelAr['scale']['x'].toDouble();
+    });
 
     onEffectAR();
   }
