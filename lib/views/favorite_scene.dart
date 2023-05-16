@@ -73,10 +73,10 @@ class _FavoriteScene extends State<FavoriteScene> {
             (museumName) => PopupMenuItem(
               child: CheckboxListTile(
                 title: Text(museumName),
-                value: isSwitched,
+                value: selectedMuseums.contains(museumName),
                 onChanged: (value) {
                   setState(() {
-                    isSwitched = value!;
+                  
                     _onMuseumSelected(
                       museumName,
                       value!,
@@ -93,24 +93,10 @@ class _FavoriteScene extends State<FavoriteScene> {
 
     return Scaffold(
         appBar: AppBar(title: const Text("Yêu thích"), actions: <Widget>[
-          Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: PopupMenuItem(child: StatefulBuilder(
-                  builder: (BuildContext context,
-                      void Function(void Function()) setState) {
-                    return Switch(
-                      value: isSwitched,
-                      onChanged: (value) {
-                        setState(() {
-                          isSwitched = value;
-                          print(isSwitched);
-                        });
-                      },
-                      activeTrackColor: Colors.lightGreenAccent,
-                      activeColor: Colors.green,
-                    );
-                  },
-                )))
+          // Padding(
+          //     padding: const EdgeInsets.only(right: 10),
+          //     child:_popupMenuButton
+          //           )
         ]),
         body: Container(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),

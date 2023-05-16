@@ -114,7 +114,16 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
         break;
       case 'paragraph':
         {
-          wg = Html(data: blData['text']);
+          wg = Html(
+            data: '<p>' + blData['text'] + '</p>',
+            style: {
+              'p': Style(
+                fontSize: FontSize(16.0), // customize font size
+                lineHeight: const LineHeight(1.5), // customize line height
+              ),
+
+            },
+          );
 
           break;
         }
