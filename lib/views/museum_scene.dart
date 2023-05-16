@@ -4,7 +4,7 @@ import 'package:maps_launcher/maps_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:arcore_example/logic/api.dart';
 import 'dart:developer';
-
+import 'museum_visit_scene.dart';
 class MuseumScene extends StatefulWidget {
   const MuseumScene({Key? key}) : super(key: key);
 
@@ -60,6 +60,7 @@ class _MuseumScene extends State<MuseumScene> {
                             address: museum['address'] ?? "Chưa cập nhật",
                             openingTime:
                                 museum['openingTime'] ?? "Chưa cập nhật",
+                            museum: museum,
                             onViewMorePressed: onViewMorePressed,
                             onContactPressed: onContactPressed))
                         .toList(): []),
@@ -74,6 +75,7 @@ class MuseumCard extends StatelessWidget {
   final String openingTime;
   final VoidCallback onViewMorePressed;
   final VoidCallback onContactPressed;
+  final dynamic museum;
 
   MuseumCard({
     required this.title,
@@ -82,12 +84,20 @@ class MuseumCard extends StatelessWidget {
     required this.openingTime,
     required this.onViewMorePressed,
     required this.onContactPressed,
+    this.museum,
   });
 
   void openDirection() {
     MapsLauncher.launchQuery(address);
 
     // MapsLauncher.launchCoordinates(37.4220041, -122.0862462);
+  }
+
+  void onVisitPressed(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MuseumVisitScene(museum: museum)));
   }
 
   @override
@@ -159,9 +169,11 @@ class MuseumCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: onContactPressed,
+                      onPressed: ()=>{ onVisitPressed(context)
+                      },
                       label: const Text('Tham quan'),
-                      icon: const Icon(Icons.airplane_ticket_rounded),
+                      icon: const Icon(Icons.person_pin_circle_outlined),
+
                     ),
                     ElevatedButton.icon(
                       onPressed: openDirection,

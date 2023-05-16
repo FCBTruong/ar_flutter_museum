@@ -165,7 +165,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
         {
           String url = blData['file']['url'];
 
-          wg =  VideoApp(url: url);
+          wg = VideoApp(url: url);
           break;
         }
       case 'audio':
@@ -249,43 +249,51 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
         },
         child: Scaffold(
           appBar: AppBar(
-              title: Text(_appBarTitle),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => !_isCachedData
-                    ? Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const MyHomePage()))
-                    : Navigator.of(context).pop(),
+            title: Text(_appBarTitle),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => !_isCachedData
+                  ? Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const MyHomePage()))
+                  : Navigator.of(context).pop(),
+            ),
+            actions: <Widget>[
+              Visibility(
+                  visible: !_isLoading && _isHasAR,
+                  child: Row(children: [
+                    const Text(
+                      'Trải nghiệm AR',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        openARView();
+                      },
+                      icon: const Icon(Icons.view_in_ar),
+                    )
+                  ])),
+              IconButton(
+                icon: Icon((_isFavorite)
+                    ? Icons.favorite
+                    : Icons.favorite_border_outlined),
+                tooltip: 'Thêm vào danh sách yêu thích',
+                onPressed: () {
+                  onClickFavorite();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text((_isFavorite)
+                          ? 'Đã thêm vào danh sách yêu thích'
+                          : "Đã xóa khỏi danh sách yêu thích")));
+                },
               ),
-              actions: <Widget>[
-                Visibility(
-                    visible: !_isLoading && _isHasAR,
-                    child: Row(children: [
-                      const Text(
-                        'Trải nghiệm AR',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          openARView();
-                        },
-                        icon: const Icon(Icons.view_in_ar),
-                      )
-                    ])),
-                IconButton(
-                  icon: Icon((_isFavorite)
-                      ? Icons.favorite
-                      : Icons.favorite_border_outlined),
-                  tooltip: 'Thêm vào danh sách yêu thích',
-                  onPressed: () {
-                    onClickFavorite();
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text((_isFavorite)
-                            ? 'Đã thêm vào danh sách yêu thích'
-                            : "Đã xóa khỏi danh sách yêu thích")));
-                  },
-                ),
-              ]),
+              IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  // Show a list of options when the menu button is pressed
+                  // You can use a DropdownButton or a showModalBottomSheet to display the options
+                },
+              ),
+            ],
+          ),
           body: (_isLoading)
               ? const Center(child: CircularProgressIndicator())
               : Container(

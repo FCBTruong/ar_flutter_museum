@@ -15,7 +15,8 @@ class _FavoriteScene extends State<FavoriteScene> {
   List<String> selectedMuseums = [];
   List<dynamic> filteredArtifacts = [];
   List<String> initMuseums = [];
- PopupMenuButton<dynamic>? _popupMenuButton;
+  PopupMenuButton<dynamic>? _popupMenuButton;
+  bool isSwitched = false;
 
   @override
   initState() {
@@ -67,31 +68,49 @@ class _FavoriteScene extends State<FavoriteScene> {
   @override
   Widget build(BuildContext context) {
     _popupMenuButton = PopupMenuButton(
-                itemBuilder: (context) => initMuseums
-                    .map<PopupMenuItem>(
-                      (museumName) => PopupMenuItem(
-                        child: CheckboxListTile(
-                          title: Text(museumName),
-                          value: selectedMuseums.contains(museumName),
-                          onChanged: (value) {
-                            _onMuseumSelected(
-                              museumName,
-                              value!,
-                            );
-                          },
-                          controlAffinity: ListTileControlAffinity.leading,
-                        ),
-                      ),
-                    )
-                    .toList(),
-                child: const Icon(Icons.filter_list),
-              );
+      itemBuilder: (context) => initMuseums
+          .map<PopupMenuItem>(
+            (museumName) => PopupMenuItem(
+              child: CheckboxListTile(
+                title: Text(museumName),
+                value: isSwitched,
+                onChanged: (value) {
+                  setState(() {
+                    isSwitched = value!;
+                    _onMuseumSelected(
+                      museumName,
+                      value!,
+                    );
+                  });            
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+          )
+          .toList(),
+      child: const Icon(Icons.filter_list),
+    );
 
     return Scaffold(
         appBar: AppBar(title: const Text("Yêu thích"), actions: <Widget>[
           Padding(
               padding: const EdgeInsets.only(right: 10),
-              child: _popupMenuButton)
+              child: PopupMenuItem(child: StatefulBuilder(
+                  builder: (BuildContext context,
+                      void Function(void Function()) setState) {
+                    return Switch(
+                      value: isSwitched,
+                      onChanged: (value) {
+                        setState(() {
+                          isSwitched = value;
+                          print(isSwitched);
+                        });
+                      },
+                      activeTrackColor: Colors.lightGreenAccent,
+                      activeColor: Colors.green,
+                    );
+                  },
+                )))
         ]),
         body: Container(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -101,88 +120,84 @@ class _FavoriteScene extends State<FavoriteScene> {
                   children: filteredArtifacts
                       .map<Widget>((artifactPackage) => Card(
                             clipBehavior: Clip.hardEdge,
-                            color: Color.fromARGB(255, 245, 245, 245),
+                            color: const Color.fromARGB(255, 245, 245, 245),
                             child: InkWell(
-                              splashColor: Color.fromARGB(255, 153, 153, 153)
-                                  .withAlpha(30),
+                              splashColor:
+                                  const Color.fromARGB(255, 153, 153, 153)
+                                      .withAlpha(30),
                               onTap: () {
                                 openArtifact(artifactPackage);
                               },
                               child: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                    child: Column(children: [
-                                      Center(
-                                          child: Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Text(
-                                                artifactPackage['artifact']
-                                                        ['name']
-                                                    .toString(),
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
-                                                    color: Colors.black),
-                                              ))),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Row(children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: Image(
-                                              image: NetworkImage(artifactPackage[
-                                                              'artifact']
-                                                          ['image'] !=
-                                                      ""
-                                                  ? artifactPackage['artifact']
-                                                      ['image']
-                                                  : "https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg")),
-                                        ),
-                                        Expanded(
-                                            flex: 7,
-                                            child: SizedBox(
-                                                child: Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Text(
-                                                Utilities.subStr(
-                                                    artifactPackage['artifact']
-                                                            ['description']
-                                                        .toString(),
-                                                    100),
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    fontSize: 15,
-                                                    color: Colors.black),
-                                                overflow: TextOverflow.fade,
-                                              ),
-                                            )))
-                                      ]),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Row(children: [
-                                        const Icon(Icons.museum_outlined,
-                                            color: Colors.black),
-                                        Text(
-                                          Utilities.subStr(
-                                              artifactPackage
-                                                      .containsKey('museumName')
-                                                  ? artifactPackage[
-                                                          'museumName']
-                                                      .toString()
-                                                  : "",
-                                              100),
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                              color: Colors.black),
-                                          overflow: TextOverflow.fade,
-                                        ),
-                                      ])
-                                    ]),
+                                padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                child: Column(children: [
+                                  Center(
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Text(
+                                            artifactPackage['artifact']['name']
+                                                .toString(),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                          ))),
+                                  const SizedBox(
+                                    height: 5,
                                   ),
+                                  Row(children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Image(
+                                          image: NetworkImage(artifactPackage[
+                                                      'artifact']['image'] !=
+                                                  ""
+                                              ? artifactPackage['artifact']
+                                                  ['image']
+                                              : "https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg")),
+                                    ),
+                                    Expanded(
+                                        flex: 7,
+                                        child: SizedBox(
+                                            child: Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Text(
+                                            Utilities.subStr(
+                                                artifactPackage['artifact']
+                                                        ['description']
+                                                    .toString(),
+                                                100),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 15,
+                                                color: Colors.black),
+                                            overflow: TextOverflow.fade,
+                                          ),
+                                        )))
+                                  ]),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Row(children: [
+                                    const Icon(Icons.museum_outlined,
+                                        color: Colors.black),
+                                    Text(
+                                      Utilities.subStr(
+                                          artifactPackage
+                                                  .containsKey('museumName')
+                                              ? artifactPackage['museumName']
+                                                  .toString()
+                                              : "",
+                                          100),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                          color: Colors.black),
+                                      overflow: TextOverflow.fade,
+                                    ),
+                                  ])
+                                ]),
+                              ),
                             ),
                           ))
                       .toList())
