@@ -57,15 +57,17 @@ class _MyHomePage extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _currentScreen is FavoriteScene ? null : AppBar(
-          title: Text(
-            title,
-          ),
-        ),
+        appBar: _currentScreen is FavoriteScene
+            ? null
+            : AppBar(
+                title: Text(
+                  title,
+                ),
+              ),
         body: PageStorage(
-            child: _currentScreen,
-            bucket: _bucket,
-          ),
+          child: _currentScreen,
+          bucket: _bucket,
+        ),
         bottomNavigationBar: createBottomAppBar(context));
   }
 

@@ -179,7 +179,7 @@ class _LocalAndWebObjectsViewState extends State<LocalAndWebObjectsView> {
           const SnackBar(content: Text('Hướng camera tới mặt phẳng')));
       return;
     }
-
+    _defaultScale = modelAr['scale']['x'].toDouble();
     var singleHitTestResult = hitTestResults.firstWhere(
         (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane);
     var newAnchor =

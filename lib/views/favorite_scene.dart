@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../logic/utilties.dart';
 import 'artifact_detail_scene.dart';
+import 'package:anim_search_bar/anim_search_bar.dart';
 
 class FavoriteScene extends StatefulWidget {
   const FavoriteScene({Key? key}) : super(key: key);
@@ -16,7 +17,7 @@ class _FavoriteScene extends State<FavoriteScene> {
   List<dynamic> filteredArtifacts = [];
   List<String> initMuseums = [];
   PopupMenuButton<dynamic>? _popupMenuButton;
-  bool isSwitched = false;
+  TextEditingController textController = TextEditingController();
 
   @override
   initState() {
@@ -76,12 +77,11 @@ class _FavoriteScene extends State<FavoriteScene> {
                 value: selectedMuseums.contains(museumName),
                 onChanged: (value) {
                   setState(() {
-                  
                     _onMuseumSelected(
                       museumName,
                       value!,
                     );
-                  });            
+                  });
                 },
                 controlAffinity: ListTileControlAffinity.leading,
               ),
@@ -97,12 +97,33 @@ class _FavoriteScene extends State<FavoriteScene> {
           //     padding: const EdgeInsets.only(right: 10),
           //     child:_popupMenuButton
           //           )
+          Padding(padding: const EdgeInsets.only(left: 10, right: 10),
+          child: AnimSearchBar(
+            width: MediaQuery.of(context).size.width - 20,
+            textController: textController,
+            onSuffixTap: () {
+              setState(() {
+                
+              });
+            },
+            onSubmitted: (String) {
+              setState(() {
+                filteredArtifacts = ArtifactFavoriteMgr.listArtifacts
+                    .where((element) => element['artifact']['name']
+                        .toString()
+                        .toLowerCase()
+                        .contains(textController.text.toLowerCase()))
+                    .toList();
+              });
+            },
+          )),
         ]),
         body: Container(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           color: Colors.white12,
           child: ArtifactFavoriteMgr.listArtifacts.isNotEmpty
-              ? ListView(
+              ? (
+               filteredArtifacts.isNotEmpty ? ListView(
                   children: filteredArtifacts
                       .map<Widget>((artifactPackage) => Card(
                             clipBehavior: Clip.hardEdge,
@@ -187,6 +208,9 @@ class _FavoriteScene extends State<FavoriteScene> {
                             ),
                           ))
                       .toList())
+                     :  Center(child: Text('Không có hiện vật nào được tìm thấy ' 
+                     + textController.text.toString()
+                      )))
               : const Center(child: Text('Chưa có mục yêu thích nào')),
         ));
   }

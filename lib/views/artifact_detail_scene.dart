@@ -1,3 +1,4 @@
+import 'package:arcore_example/logic/utilties.dart';
 import 'package:arcore_example/qr_code.dart';
 import 'package:arcore_example/views/audio_player.dart';
 import 'package:arcore_example/views/homeView.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:arcore_example/logic/artifact_favorite_mgr.dart';
 import 'package:appinio_video_player/appinio_video_player.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class ArtifactDetailScene extends StatefulWidget {
@@ -32,6 +34,7 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
   dynamic artifact;
   dynamic artifactPackage;
   bool _isCachedData = false;
+  double fontSize = Utilities.FONT_MEDIUM;
 
   @override
   initState() {
@@ -41,6 +44,14 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     _isHasAR = false;
     _isCachedData = widget.artifactPackage != null;
     fetchData();
+    asyncInit();
+  }
+
+  void asyncInit() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      fontSize = prefs.getDouble('fontSize') ?? Utilities.FONT_MEDIUM;
+    });
   }
 
   Future fetchData() async {
@@ -100,15 +111,16 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     Map<String, dynamic> blData = block['data'];
     switch (block['type']) {
       case 'header':
+        double level = block['data']['level'].toDouble();
         wg = Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
             child: Text(
               blData['text'],
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
-                fontSize: 28,
+                fontSize: 28.0 - level,
               ),
             ));
         break;
@@ -118,10 +130,9 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
             data: '<p>' + blData['text'] + '</p>',
             style: {
               'p': Style(
-                fontSize: FontSize(16.0), // customize font size
+                fontSize: FontSize(fontSize), // customize font size
                 lineHeight: const LineHeight(1.5), // customize line height
               ),
-
             },
           );
 
@@ -246,6 +257,66 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
     });
   }
 
+  void _updateFontSize(double fontSize) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble('fontSize', fontSize);
+  }
+
+  void _changeFontSize() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Đổi kích thước chữ'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                const SizedBox(
+                  height: 10,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          fontSize = Utilities.FONT_SMALL;
+                          _updateFontSize(fontSize);
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Nhỏ'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          fontSize = Utilities.FONT_MEDIUM;
+                          _updateFontSize(fontSize);
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Vừa'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          fontSize = Utilities.FONT_LARGE;
+                          _updateFontSize(fontSize);
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Lớn'),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -262,8 +333,10 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.black),
               onPressed: () => !_isCachedData
-                  ? Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const MyHomePage()))
+                  ? Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => const MyHomePage()),
+                      (Route<dynamic> route) => false)
                   : Navigator.of(context).pop(),
             ),
             actions: <Widget>[
@@ -294,13 +367,47 @@ class _ArtifactDetailScene extends State<ArtifactDetailScene> {
                           : "Đã xóa khỏi danh sách yêu thích")));
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () {
-                  // Show a list of options when the menu button is pressed
-                  // You can use a DropdownButton or a showModalBottomSheet to display the options
-                },
-              ),
+              PopupMenuButton(
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                        PopupMenuItem(
+                          child: Row(children: [
+                            const Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: Icon(Icons.text_fields_rounded)),
+                            Text('Kích thước chữ' ' (' +
+                                Utilities.getFontSizeName(fontSize) +
+                                ')'),
+                          ]),
+                          value: 1,
+                        ),
+                        PopupMenuItem(
+                          child: Row(children: const [
+                            Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: Icon(Icons.share)),
+                            Text('Chia sẻ'),
+                          ]),
+                          value: 2,
+                        ),
+                      ],
+                  onSelected: (value) {
+                    switch (value) {
+                      case 1:
+                        _changeFontSize();
+                        break;
+                      case 2:
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text('Chức năng đang được phát triển')));
+                        break;
+                      default:
+                        _changeFontSize();
+                    }
+                  },
+                  child: const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Icon(Icons.menu))),
             ],
           ),
           body: (_isLoading)
